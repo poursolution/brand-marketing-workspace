@@ -606,6 +606,24 @@
 
   /* KPI branch (circle level) */
   .gl-kpi { border: 1.5px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; background: var(--surface); }
+
+  /* KPI brand group (in goals page) — minimal: just a section label, no box */
+  .gl-brand-group {
+    margin-bottom: 24px;
+  }
+  .gl-brand-group:last-child { margin-bottom: 0; }
+  .gl-brand-group-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 4px 10px;
+    border-bottom: 2px solid var(--brand-color);
+    margin-bottom: 12px;
+  }
+  .gl-bg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .gl-bg-name { font-size: 14px; font-weight: 800; color: var(--text); letter-spacing: -0.01em; }
+  .gl-bg-count { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+  .gl-bg-avg { margin-left: auto; font-size: 12px; font-weight: 700; color: var(--brand-color); }
+  .gl-brand-group-body { padding: 0; }
+  .gl-brand-group-body .gl-kpi:last-child { margin-bottom: 0; }
   .gl-kpi-head { display: flex; align-items: center; gap: 10px; padding: 13px 16px; background: #eef2ff; border-bottom: 1px solid var(--border); }
   .gl-kpi-dot { width: 10px; height: 10px; border-radius: 50%; background: #6366f1; flex-shrink: 0; }
   .gl-kpi-brand-tag { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; letter-spacing: -0.01em; }
@@ -3483,7 +3501,24 @@ function renderGoalsKpiTree(kpis, projsByKpi, userId) {
   if (kpis.length === 0 && !projsByKpi['__nokpi__']) {
     return '<div class="gl-empty-mini">연결된 KPI/프로젝트가 없어요. 프로젝트에 하위업무가 할당되면 여기에 표시됩니다.</div>';
   }
-  return kpis.map(k => {
+
+  // Group KPIs by brand
+  const byBrand = {}; // brandId -> kpis[]
+  const noBrand = [];
+  kpis.forEach(k => {
+    if (k.brandId) {
+      (byBrand[k.brandId] = byBrand[k.brandId] || []).push(k);
+    } else {
+      noBrand.push(k);
+    }
+  });
+
+  // Brand groups in state.brands order, only those with KPIs
+  const brandGroups = state.brands
+    .filter(b => byBrand[b.id]?.length > 0)
+    .map(b => ({ brand: b, kpis: byBrand[b.id] }));
+
+  function kpiItem(k) {
     const p = kpiProgress(k);
     const pct = p.pct;
     const projs = projsByKpi[k.id] || [];
@@ -3493,7 +3528,6 @@ function renderGoalsKpiTree(kpis, projsByKpi, userId) {
       <div class="gl-kpi">
         <div class="gl-kpi-head">
           <span class="gl-kpi-dot" style="background:${dotColor}"></span>
-          ${br ? `<span class="gl-kpi-brand-tag" style="background:${br.color}1a;color:${br.color}">${esc(br.name)}</span>` : '<span class="gl-kpi-brand-tag" style="background:var(--surface-soft);color:var(--text-muted)">미지정</span>'}
           <span class="gl-kpi-name">${esc(k.title)}${p.isAuto ? ' <span class="kpi-auto-badge">자동</span>' : ''}</span>
           <span class="gl-kpi-sub">${p.current}/${p.target} ${esc(p.unit || '')}</span>
           <div class="gl-kpi-bar-wrap">
@@ -3507,7 +3541,31 @@ function renderGoalsKpiTree(kpis, projsByKpi, userId) {
         </div>
       </div>
     `;
-  }).join('');
+  }
+
+  function brandGroupHtml(b, kpiList) {
+    const avg = kpiList.length
+      ? Math.round(kpiList.reduce((s,k) => s + kpiProgress(k).pct, 0) / kpiList.length)
+      : 0;
+    return `
+      <div class="gl-brand-group" style="--brand-color:${b ? b.color : 'var(--text-light)'}">
+        <div class="gl-brand-group-head">
+          <span class="gl-bg-dot" style="background:${b ? b.color : 'var(--text-light)'}"></span>
+          <span class="gl-bg-name">${b ? esc(b.name) : '미지정'}</span>
+          <span class="gl-bg-count">${kpiList.length}</span>
+          <span class="gl-bg-avg">평균 ${avg}%</span>
+        </div>
+        <div class="gl-brand-group-body">
+          ${kpiList.map(kpiItem).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    ${brandGroups.map(g => brandGroupHtml(g.brand, g.kpis)).join('')}
+    ${noBrand.length > 0 ? brandGroupHtml(null, noBrand) : ''}
+  `;
 }
 
 function renderGoalsNoKpiProjects(projs, userId) {
