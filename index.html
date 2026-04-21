@@ -1070,6 +1070,7 @@
   .kpi-dash-kitem { padding: 10px 0; transition: background 0.12s; border-radius: 5px; position: relative; }
   .kpi-dash-kitem[data-action]:hover { background: rgba(99,102,241,0.04); margin: 0 -6px; padding-left: 6px; padding-right: 6px; }
   .kpi-dash-kitem:hover .kpi-dash-kitem-edit { opacity: 1; }
+  .kpi-dash-kitem:hover .kpi-dash-kitem-reorder { opacity: 1; }
   .kpi-dash-kitem.force-open { padding: 0; }
   .kpi-dash-kitem.force-open:hover { background: transparent; margin: 0; padding: 0; }
   .kpi-dash-kitem-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
@@ -1080,6 +1081,13 @@
   .kpi-dash-kitem-val .knum { font-size: 14px; font-weight: 800; color: var(--text); }
   .kpi-dash-kitem-edit { opacity: 0; padding: 3px 8px; border-radius: 5px; background: var(--surface-soft); color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); transition: all 0.12s; flex-shrink: 0; }
   .kpi-dash-kitem-edit:hover { background: var(--primary); color: white; border-color: var(--primary); }
+  .kpi-dash-kitem-reorder { opacity: 0; width: 22px; height: 22px; border-radius: 5px; background: var(--surface-soft); color: var(--text-muted); font-size: 9px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); transition: all 0.12s; flex-shrink: 0; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+  .kpi-dash-kitem-reorder:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); }
+  .kpi-dash-kitem-reorder:disabled { opacity: 0.25 !important; cursor: not-allowed; }
+  .kpi-dash-kitem.force-open .kpi-dash-kitem-reorder { opacity: 0.5; }
+  .kpi-dash-kitem.force-open .kpi-dash-kitem-reorder:hover:not(:disabled) { opacity: 1; }
+  .kpi-dash-kitem.force-open .kpi-dash-kitem-edit { opacity: 0.5; }
+  .kpi-dash-kitem.force-open .kpi-dash-kitem-edit:hover { opacity: 1; }
   .kpi-dash-kitem-pct { font-size: 14px; font-weight: 800; flex-shrink: 0; white-space: nowrap; min-width: 42px; text-align: right; }
   .kpi-dash-kitem-pct.hi { color: var(--success); }
   .kpi-dash-kitem-pct.mid { color: var(--primary); }
@@ -1124,8 +1132,15 @@
   /* Project-grouped task layout (in detail mode) */
   .kpi-dash-proj-block { margin-bottom: 12px; padding: 10px 10px 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
   .kpi-dash-proj-block:last-child { margin-bottom: 2px; }
-  .kpi-dash-proj-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4px 4px 8px; cursor: pointer; border-bottom: 1px dashed var(--border); margin-bottom: 8px; transition: color 0.12s; }
-  .kpi-dash-proj-head:hover .kpi-dash-proj-name { color: var(--primary); }
+  .kpi-dash-proj-block.collapsed { padding-bottom: 10px; }
+  .kpi-dash-proj-block.collapsed .kpi-dash-proj-head { border-bottom: none; margin-bottom: 0; padding-bottom: 4px; }
+  .kpi-dash-proj-head { display: flex; align-items: center; gap: 8px; padding: 4px 4px 8px; cursor: pointer; border-bottom: 1px dashed var(--border); margin-bottom: 8px; transition: color 0.12s; user-select: none; }
+  .kpi-dash-proj-head:hover .kpi-dash-proj-caret { color: var(--primary); }
+  .kpi-dash-proj-caret { font-size: 9px; color: var(--text-muted); width: 10px; text-align: center; flex-shrink: 0; transition: color 0.12s; }
+  .kpi-dash-proj-name { font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kpi-dash-proj-name[data-action]:hover { color: var(--primary); text-decoration: underline; }
+  .kpi-dash-proj-tasks-count { font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 2px 7px; border-radius: 4px; background: var(--surface-soft); flex-shrink: 0; }
+  .kpi-dash-proj-prog { font-size: 11.5px; color: var(--primary); font-weight: 700; flex-shrink: 0; }
   .kpi-dash-proj-name { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .kpi-dash-proj-prog { font-size: 11px; color: var(--text-muted); flex-shrink: 0; font-weight: 600; }
   .kpi-dash-proj-tasks { display: flex; flex-direction: column; gap: 0; }
@@ -1649,6 +1664,17 @@ function projectProgress(projectId) {
 // KPI progress — returns {pct, current, target, unit, isAuto}
 // Auto mode: derived from linked tasks (done count / total count)
 // Manual mode: current/target as entered
+// Sort KPIs by 'order' (lower first), with createdAt as tie-breaker (older first)
+// Mutates a copy, not the original array
+function sortKpis(kpis) {
+  return [...kpis].sort((a, b) => {
+    const ao = typeof a.order === 'number' ? a.order : 999999;
+    const bo = typeof b.order === 'number' ? b.order : 999999;
+    if (ao !== bo) return ao - bo;
+    return (a.createdAt || '').localeCompare(b.createdAt || '');
+  });
+}
+
 function kpiProgress(k) {
   if (!k) return { pct: 0, current: 0, target: 0, unit: '', isAuto: false };
   if (k.mode === 'auto') {
@@ -2017,7 +2043,7 @@ function renderDashboard() {
           const bTasks = state.tasks.filter(t => t.brandId === b.id);
           const bOpen = bTasks.filter(t => t.status !== 'done').length;
           const bProj = state.projects.filter(p => p.brandId === b.id && p.status === 'active').length;
-          const bKpis = state.kpis.filter(k => k.brandId === b.id);
+          const bKpis = sortKpis(state.kpis.filter(k => k.brandId === b.id));
           const avg = bKpis.length ? Math.round(bKpis.reduce((s,k) => s + kpiProgress(k).pct, 0) / bKpis.length) : 0;
           return `
             <div data-action="filter-by-brand" data-id="${b.id}" style="cursor:pointer;padding:14px;background:${b.color}0d;border:1px solid ${b.color}33;border-radius:10px">
@@ -3076,12 +3102,12 @@ function renderKPIs() {
   if (f === '__none__') brandsToShow = [];
   const isFiltered = f !== 'all';
 
-  const noKpiKpis = state.kpis.filter(k => !k.brandId);
+  const noKpiKpis = sortKpis(state.kpis.filter(k => !k.brandId));
 
   // Helper: render single KPI item with accordion expansion
   // 전체 view: collapsed by default, click row to toggle
   // 상세 view (forceOpen=true): always expanded with project-grouped tasks
-  function kpiItemHtml(k, forceOpen = false) {
+  function kpiItemHtml(k, forceOpen = false, idx = -1, total = 0) {
     const p = kpiProgress(k);
     const pct = p.pct;
     const kCls = pct >= 80 ? 'hi' : pct >= 40 ? 'mid' : 'lo';
@@ -3123,45 +3149,66 @@ function renderKPIs() {
           ${linkedProjects.map(p => {
             const projTasks = allLinkedTasks.filter(t => t.projectId === p.id);
             const prog = projectProgress(p.id);
+            // Transient collapse state per project (defaults to expanded)
+            window._kpiProjCollapsed = window._kpiProjCollapsed || new Set();
+            const projKey = `${k.id}::${p.id}`;
+            const isCollapsed = window._kpiProjCollapsed.has(projKey);
             return `
-              <div class="kpi-dash-proj-block">
-                <div class="kpi-dash-proj-head" data-action="open-project" data-id="${p.id}">
-                  <span class="kpi-dash-proj-name">◇ ${esc(p.name)}</span>
-                  <span class="kpi-dash-proj-prog">진행률 ${prog}%</span>
+              <div class="kpi-dash-proj-block ${isCollapsed?'collapsed':''}">
+                <div class="kpi-dash-proj-head" data-action="kpi-proj-toggle" data-id="${projKey}">
+                  <span class="kpi-dash-proj-caret">${isCollapsed?'▶':'▼'}</span>
+                  <span class="kpi-dash-proj-name" data-action="open-project" data-id="${p.id}">◇ ${esc(p.name)}</span>
+                  <span class="kpi-dash-proj-tasks-count">${projTasks.length}개 업무</span>
+                  <span class="kpi-dash-proj-prog">${prog}%</span>
                 </div>
-                ${projTasks.length ? `
+                ${isCollapsed ? '' : (projTasks.length ? `
                   <div class="kpi-dash-proj-tasks">
                     ${projTasks.slice(0, 8).map(renderTaskRow).join('')}
                     ${projTasks.length > 8 ? `<div class="kpi-dash-acc-empty">외 ${projTasks.length-8}개 더</div>` : ''}
                   </div>
-                ` : `<div class="kpi-dash-acc-empty kpi-dash-proj-empty">이 프로젝트에 연결된 업무 없음</div>`}
+                ` : `<div class="kpi-dash-acc-empty kpi-dash-proj-empty">이 프로젝트에 연결된 업무 없음</div>`)}
               </div>
             `;
           }).join('')}
 
-          ${orphanTasks.length > 0 ? `
-            <div class="kpi-dash-proj-block">
-              <div class="kpi-dash-proj-head" style="cursor:default">
-                <span class="kpi-dash-proj-name" style="color:var(--text-muted)">◌ 프로젝트 없는 업무</span>
-                <span class="kpi-dash-proj-prog">${orphanTasks.length}개</span>
+          ${orphanTasks.length > 0 ? (() => {
+            window._kpiProjCollapsed = window._kpiProjCollapsed || new Set();
+            const orphanKey = `${k.id}::__orphan__`;
+            const isCollapsed = window._kpiProjCollapsed.has(orphanKey);
+            return `
+              <div class="kpi-dash-proj-block ${isCollapsed?'collapsed':''}">
+                <div class="kpi-dash-proj-head" data-action="kpi-proj-toggle" data-id="${orphanKey}">
+                  <span class="kpi-dash-proj-caret">${isCollapsed?'▶':'▼'}</span>
+                  <span class="kpi-dash-proj-name" style="color:var(--text-muted)">◌ 프로젝트 없는 업무</span>
+                  <span class="kpi-dash-proj-tasks-count">${orphanTasks.length}개</span>
+                </div>
+                ${isCollapsed ? '' : `
+                  <div class="kpi-dash-proj-tasks">
+                    ${orphanTasks.slice(0, 8).map(renderTaskRow).join('')}
+                    ${orphanTasks.length > 8 ? `<div class="kpi-dash-acc-empty">외 ${orphanTasks.length-8}개 더</div>` : ''}
+                  </div>
+                `}
               </div>
-              <div class="kpi-dash-proj-tasks">
-                ${orphanTasks.slice(0, 8).map(renderTaskRow).join('')}
-                ${orphanTasks.length > 8 ? `<div class="kpi-dash-acc-empty">외 ${orphanTasks.length-8}개 더</div>` : ''}
-              </div>
-            </div>
-          ` : ''}
+            `;
+          })() : ''}
         </div>
       `;
     }
 
-    // 전체 view: entire row toggles accordion. Only ✎ opens edit modal.
+    // 전체 view: entire row toggles accordion. Only ✎ and reorder buttons act independently.
+    const isFirst = idx === 0;
+    const isLast = idx === total - 1;
+    const showReorder = total > 1;
     return `
       <div class="kpi-dash-kitem ${isOpen?'open':''} ${forceOpen?'force-open':''}" ${forceOpen?'':`data-action="kpi-item-toggle" data-id="${k.id}" style="cursor:pointer"`}>
         <div class="kpi-dash-kitem-row">
           ${forceOpen ? '' : `<span class="kpi-dash-kitem-arrow">${isOpen?'▼':'▶'}</span>`}
           <span class="kpi-dash-kitem-title">${esc(k.title)}${p.isAuto ? ' <span class="kpi-auto-badge">자동</span>' : ''}</span>
           <span class="kpi-dash-kitem-val"><span class="knum">${p.current}</span> / ${p.target} ${esc(p.unit)}</span>
+          ${showReorder ? `
+            <button class="kpi-dash-kitem-reorder" data-action="kpi-move-up" data-id="${k.id}" title="위로 이동" ${isFirst?'disabled':''}>▲</button>
+            <button class="kpi-dash-kitem-reorder" data-action="kpi-move-down" data-id="${k.id}" title="아래로 이동" ${isLast?'disabled':''}>▼</button>
+          ` : ''}
           <button class="kpi-dash-kitem-edit" data-action="open-kpi" data-id="${k.id}" title="수정">✎</button>
           <span class="kpi-dash-kitem-pct ${kCls}">${pct}%</span>
         </div>
@@ -3195,7 +3242,7 @@ function renderKPIs() {
           </div>
         `}
         <div class="kpi-dash-kpis">
-          ${hasKpis ? bKpis.map(k => kpiItemHtml(k)).join('') : '<div class="kpi-dash-empty-kpis">아직 KPI가 없어요</div>'}
+          ${hasKpis ? bKpis.map((k, i) => kpiItemHtml(k, false, i, bKpis.length)).join('') : '<div class="kpi-dash-empty-kpis">아직 KPI가 없어요</div>'}
           <button class="kpi-dash-add" data-action="new-kpi-for-brand" data-id="${b.id}">+ KPI 추가</button>
         </div>
       </div>
@@ -3203,7 +3250,7 @@ function renderKPIs() {
   }
 
   const brandCardsHtml = brandsToShow.map(b => {
-    const bKpis = state.kpis.filter(k => k.brandId === b.id);
+    const bKpis = sortKpis(state.kpis.filter(k => k.brandId === b.id));
     return brandCardHtml(b, bKpis);
   }).join('');
 
@@ -3229,7 +3276,7 @@ function renderKPIs() {
           </div>
         `}
         <div class="kpi-dash-kpis">
-          ${noKpiKpis.map(k => kpiItemHtml(k)).join('')}
+          ${noKpiKpis.map((k, i) => kpiItemHtml(k, false, i, noKpiKpis.length)).join('')}
         </div>
       </div>
     `;
@@ -3241,7 +3288,7 @@ function renderKPIs() {
   // Show brand summary card at top + KPI cards in 3-column grid (always expanded)
   if (isFiltered && brandsToShow.length === 1 && brandsToShow[0].id !== '__none__') {
     const b = brandsToShow[0];
-    const bKpis = state.kpis.filter(k => k.brandId === b.id);
+    const bKpis = sortKpis(state.kpis.filter(k => k.brandId === b.id));
     const hasKpis = bKpis.length > 0;
     const avg = hasKpis ? Math.round(bKpis.reduce((s,k) => s + kpiProgress(k).pct, 0) / bKpis.length) : 0;
     const pctCls = !hasKpis ? 'none' : avg >= 80 ? 'hi' : avg >= 40 ? 'mid' : 'lo';
@@ -3266,7 +3313,7 @@ function renderKPIs() {
       <div class="kpi-detail-section-label">📊 ${esc(b.name)} KPI 상세</div>
       ${hasKpis ? `
         <div class="kpi-detail-grid">
-          ${bKpis.map(k => `<div class="kpi-detail-card">${kpiItemHtml(k, true)}</div>`).join('')}
+          ${bKpis.map((k, i) => `<div class="kpi-detail-card">${kpiItemHtml(k, true, i, bKpis.length)}</div>`).join('')}
           <button class="kpi-detail-add" data-action="new-kpi-for-brand" data-id="${b.id}">
             <span class="add-icon">+</span>
             <span>KPI 추가</span>
@@ -3516,7 +3563,7 @@ function renderGoalsKpiTree(kpis, projsByKpi, userId) {
   // Brand groups in state.brands order, only those with KPIs
   const brandGroups = state.brands
     .filter(b => byBrand[b.id]?.length > 0)
-    .map(b => ({ brand: b, kpis: byBrand[b.id] }));
+    .map(b => ({ brand: b, kpis: sortKpis(byBrand[b.id]) }));
 
   function kpiItem(k) {
     const p = kpiProgress(k);
@@ -3564,7 +3611,7 @@ function renderGoalsKpiTree(kpis, projsByKpi, userId) {
 
   return `
     ${brandGroups.map(g => brandGroupHtml(g.brand, g.kpis)).join('')}
-    ${noBrand.length > 0 ? brandGroupHtml(null, noBrand) : ''}
+    ${noBrand.length > 0 ? brandGroupHtml(null, sortKpis(noBrand)) : ''}
   `;
 }
 
@@ -4920,6 +4967,26 @@ async function actionDeleteKPI(id) {
   });
 }
 
+// Move KPI up (-1) or down (+1) within its brand group
+async function actionMoveKpi(id, delta) {
+  const k = state.kpis.find(x => x.id === id);
+  if (!k) return;
+  // Sibling group: same brandId (including null/missing for "미지정")
+  const siblings = sortKpis(state.kpis.filter(x => (x.brandId || null) === (k.brandId || null)));
+  // Normalize order field on all siblings if not yet set
+  siblings.forEach((s, i) => { s.order = i; });
+  const idx = siblings.findIndex(s => s.id === id);
+  const newIdx = idx + delta;
+  if (newIdx < 0 || newIdx >= siblings.length) return; // out of bounds
+  // Swap order values
+  const a = siblings[idx];
+  const b = siblings[newIdx];
+  const tmp = a.order;
+  a.order = b.order;
+  b.order = tmp;
+  await saveState(); render();
+}
+
 async function actionSaveMember(id) {
   const m = state.members.find(x => x.id === id);
   m.name = document.querySelector(`[data-team-name="${id}"]`).value.trim() || m.name;
@@ -5878,6 +5945,14 @@ document.addEventListener('click', async (e) => {
       window._kpiOpen = window._kpiOpen || new Set();
       if (window._kpiOpen.has(id)) window._kpiOpen.delete(id);
       else window._kpiOpen.add(id);
+      return render();
+    }
+    case 'kpi-move-up': return actionMoveKpi(id, -1);
+    case 'kpi-move-down': return actionMoveKpi(id, +1);
+    case 'kpi-proj-toggle': {
+      window._kpiProjCollapsed = window._kpiProjCollapsed || new Set();
+      if (window._kpiProjCollapsed.has(id)) window._kpiProjCollapsed.delete(id);
+      else window._kpiProjCollapsed.add(id);
       return render();
     }
     case 'kpi-collapse-all': {
