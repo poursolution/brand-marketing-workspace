@@ -597,6 +597,7 @@
   .gl-kpi { border: 1.5px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; background: var(--surface); }
   .gl-kpi-head { display: flex; align-items: center; gap: 10px; padding: 13px 16px; background: #eef2ff; border-bottom: 1px solid var(--border); }
   .gl-kpi-dot { width: 10px; height: 10px; border-radius: 50%; background: #6366f1; flex-shrink: 0; }
+  .gl-kpi-brand-tag { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; letter-spacing: -0.01em; }
   .gl-kpi-name { font-size: 14px; font-weight: 700; color: var(--text); }
   .gl-kpi-sub { font-size: 11px; color: var(--text-muted); margin-left: 4px; }
   .gl-kpi-bar-wrap { display: flex; align-items: center; gap: 8px; margin-left: auto; }
@@ -720,6 +721,58 @@
   .pj-filter-mine { background: var(--primary-soft); color: var(--primary); border-color: var(--primary-soft); }
   .pj-filter-mine:hover { border-color: var(--primary); color: var(--primary); }
   .pj-filter-mine.active { background: var(--primary); color: white; border-color: var(--primary); }
+  .pj-filter-paused { background: var(--bg-2); color: var(--warning); }
+  .pj-filter-paused.active { background: var(--warning); color: white; border-color: var(--warning); }
+
+  /* Done view controls (search + brand sub-filter) */
+  .done-controls { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+  .done-search-wrap { position: relative; margin-bottom: 12px; }
+  .done-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; opacity: 0.5; }
+  .done-search { width: 100%; padding: 9px 36px 9px 36px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: var(--bg-2); transition: all 0.15s; font-family: inherit; }
+  .done-search:focus { outline: none; border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+  .done-search-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border-radius: 50%; background: var(--surface-soft); color: var(--text-muted); font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; border: none; }
+  .done-search-clear:hover { background: var(--danger-soft); color: var(--danger); }
+  .done-brand-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .done-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); font-size: 11.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.12s; }
+  .done-chip:hover { border-color: var(--text-muted); }
+  .done-chip.active { background: var(--text); color: white; border-color: var(--text); }
+  .done-chip-count { opacity: 0.7; font-weight: 500; font-size: 10.5px; }
+
+  /* PJ sidebar empty */
+  .pj-sidebar-empty { padding: 24px 12px; text-align: center; font-size: 12.5px; color: var(--text-muted); font-style: italic; }
+
+  /* Mine view: brand-grouped accordion */
+  .pj-brand-group { margin-bottom: 6px; }
+  .pj-brand-group-head {
+    display: flex; align-items: center; gap: 7px; padding: 8px 10px; cursor: pointer;
+    background: var(--surface-soft); border-radius: 7px; transition: all 0.12s;
+    border-left: 3px solid var(--brand-color, var(--border));
+    user-select: none;
+  }
+  .pj-brand-group-head:hover { background: var(--bg-2); }
+  .pj-bg-arrow { font-size: 9px; color: var(--text-muted); width: 10px; text-align: center; flex-shrink: 0; }
+  .pj-bg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .pj-bg-name { flex: 1; font-size: 12.5px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -0.01em; }
+  .pj-bg-count { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: var(--surface); color: var(--text-muted); flex-shrink: 0; }
+  .pj-brand-group-list { padding: 6px 0 4px 8px; }
+  .pj-brand-group.collapsed .pj-bg-arrow { color: var(--text-light); }
+
+  /* Hidden project styling + action button */
+  .pj-list-item.is-hidden { opacity: 0.6; }
+  .pj-list-item.is-hidden .pji-title { color: var(--text-muted); font-style: italic; }
+  .pji-hidden-tag { font-size: 9.5px; font-weight: 700; padding: 1px 5px; border-radius: 3px; background: var(--surface-soft); color: var(--text-muted); margin-left: 4px; vertical-align: 1px; letter-spacing: 0.04em; }
+  .pji-action-btn { font-size: 14px; padding: 2px 6px; border-radius: 4px; cursor: pointer; opacity: 0; transition: all 0.12s; flex-shrink: 0; line-height: 1; }
+  .pj-list-item:hover .pji-action-btn { opacity: 0.7; }
+  .pji-action-btn:hover { opacity: 1 !important; background: var(--surface-soft); }
+  .pj-list-item.is-hidden .pji-action-btn { opacity: 0.7; }
+
+  /* Hidden toggle bar */
+  .hidden-toggle-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: var(--bg-2); border: 1px dashed var(--border);
+    border-radius: 8px; margin-bottom: 14px; gap: 10px;
+  }
+  .hidden-toggle-info { font-size: 12.5px; color: var(--text-muted); font-weight: 600; }
 
   .pj-page { display: grid; grid-template-columns: 300px 1fr; gap: 18px; align-items: start; }
   @media (max-width: 900px) { .pj-page { grid-template-columns: 1fr; } }
@@ -1136,6 +1189,7 @@ const initialState = () => ({
   dailyNotes: {},
   pinnedMemo: '',
   trash: [],
+  hiddenProjectsByUser: {},
   log: [],
 });
 
@@ -1248,6 +1302,7 @@ async function loadState() {
   state.brands.forEach(b => { if (typeof b.goal !== 'string') b.goal = ''; });
   if (!Array.isArray(state.taskTemplates)) state.taskTemplates = [];
   if (!Array.isArray(state.trash)) state.trash = [];
+  if (!state.hiddenProjectsByUser || typeof state.hiddenProjectsByUser !== 'object') state.hiddenProjectsByUser = {};
   // Auto-purge trash items older than 7 days
   const TRASH_DAYS = 7;
   const cutoff = Date.now() - TRASH_DAYS * 24 * 60 * 60 * 1000;
@@ -2239,40 +2294,220 @@ function renderProjects() {
 
   // Default filter: 'mine' (my projects). Falls back to first brand.
   let f = session.projectBrandFilter;
-  if (!f || (f !== 'done' && f !== 'all' && f !== 'mine' && !state.brands.find(b => b.id === f))) {
+  if (!f || (f !== 'done' && f !== 'paused' && f !== 'all' && f !== 'mine' && !state.brands.find(b => b.id === f))) {
     f = 'mine';
     session.projectBrandFilter = f;
   }
   const meId = session.currentUserId;
   const myProjectIds = new Set(state.tasks.filter(t => t.assigneeId === meId).map(t => t.projectId).filter(Boolean));
+  // Per-user hidden projects
+  const hiddenSet = new Set(state.hiddenProjectsByUser?.[meId] || []);
   let filtered;
+  let hiddenCount = 0;
   if (f === 'done') {
     filtered = state.projects.filter(p => p.status === 'done');
+  } else if (f === 'paused') {
+    filtered = state.projects.filter(p => p.status === 'paused');
   } else if (f === 'all') {
-    filtered = state.projects.filter(p => p.status !== 'done');
+    filtered = state.projects.filter(p => p.status === 'active');
   } else if (f === 'mine') {
-    filtered = state.projects.filter(p => p.status !== 'done' && myProjectIds.has(p.id));
+    const allMine = state.projects.filter(p => p.status === 'active' && myProjectIds.has(p.id));
+    if (session.showHiddenInMine) {
+      filtered = allMine; // show all including hidden
+    } else {
+      filtered = allMine.filter(p => !hiddenSet.has(p.id));
+      hiddenCount = allMine.length - filtered.length;
+    }
   } else {
-    filtered = state.projects.filter(p => p.brandId === f && p.status !== 'done');
+    filtered = state.projects.filter(p => p.brandId === f && p.status === 'active');
   }
 
   if (!session.selectedProjectId || !filtered.find(p => p.id === session.selectedProjectId)) {
     session.selectedProjectId = filtered[0]?.id || null;
   }
 
+  // === DONE / PAUSED VIEW: extra filtering by brand + search ===
+  let doneSearchHtml = '';
+  if (f === 'done' || f === 'paused') {
+    const doneBrandFilter = session.doneBrandFilter || 'all';
+    const doneSearch = (session.doneSearch || '').toLowerCase();
+    const isPaused = f === 'paused';
+    const placeholderText = isPaused ? '보류된 프로젝트 검색 (이름·설명)' : '완료된 프로젝트 검색 (이름·설명)';
+
+    // Apply sub-filters
+    let beforeFilter = filtered;
+    if (doneBrandFilter !== 'all') {
+      filtered = filtered.filter(p => p.brandId === doneBrandFilter);
+    }
+    if (doneSearch) {
+      filtered = filtered.filter(p =>
+        p.name?.toLowerCase().includes(doneSearch) ||
+        p.desc?.toLowerCase().includes(doneSearch)
+      );
+    }
+
+    // Brand counts
+    const brandCounts = { all: beforeFilter.length };
+    state.brands.forEach(b => {
+      brandCounts[b.id] = beforeFilter.filter(p => p.brandId === b.id).length;
+    });
+    const noneCnt = beforeFilter.filter(p => !p.brandId).length;
+
+    doneSearchHtml = `
+      <div class="done-controls">
+        <div class="done-search-wrap">
+          <span class="done-search-icon">🔍</span>
+          <input type="text" class="done-search" placeholder="${placeholderText}" value="${esc(session.doneSearch || '')}" oninput="window.handleDoneSearch(this.value)" autofocus>
+          ${doneSearch ? `<button class="done-search-clear" onclick="window.handleDoneSearch('')" title="지우기">✕</button>` : ''}
+        </div>
+        <div class="done-brand-chips">
+          <span class="done-chip ${doneBrandFilter==='all'?'active':''}" data-action="done-brand-filter" data-id="all">전체<span class="done-chip-count">${brandCounts.all}</span></span>
+          ${state.brands.filter(b => brandCounts[b.id] > 0).map(b => `
+            <span class="done-chip ${doneBrandFilter===b.id?'active':''}" data-action="done-brand-filter" data-id="${b.id}" style="${doneBrandFilter===b.id?`background:${b.color};border-color:${b.color};color:white`:`color:${b.color};border-color:${b.color}66`}">${esc(b.name)}<span class="done-chip-count">${brandCounts[b.id]}</span></span>
+          `).join('')}
+          ${noneCnt > 0 ? `<span class="done-chip ${doneBrandFilter==='__none__'?'active':''}" data-action="done-brand-filter" data-id="__none__">미지정<span class="done-chip-count">${noneCnt}</span></span>` : ''}
+        </div>
+      </div>
+    `;
+
+    if (!session.selectedProjectId || !filtered.find(p => p.id === session.selectedProjectId)) {
+      session.selectedProjectId = filtered[0]?.id || null;
+    }
+  }
+
   if (filtered.length === 0) {
     let msg;
-    if (f === 'done') msg = '완료된 프로젝트가 아직 없어요.';
+    if (f === 'done') {
+      const hasSearch = session.doneSearch || (session.doneBrandFilter && session.doneBrandFilter !== 'all');
+      msg = hasSearch ? '검색 결과가 없어요. 다른 키워드를 시도해보세요.' : '완료된 프로젝트가 아직 없어요.';
+    }
+    else if (f === 'paused') {
+      const hasSearch = session.doneSearch || (session.doneBrandFilter && session.doneBrandFilter !== 'all');
+      msg = hasSearch ? '검색 결과가 없어요. 다른 키워드를 시도해보세요.' : '보류 중인 프로젝트가 없어요.';
+    }
     else if (f === 'all') msg = '진행 중인 프로젝트가 없어요.';
-    else if (f === 'mine') msg = '내가 담당하는 프로젝트가 없어요. 다른 브랜드 칩을 눌러서 보세요.';
+    else if (f === 'mine') {
+      msg = hiddenCount > 0
+        ? `숨긴 프로젝트 ${hiddenCount}개를 제외하면 보일 프로젝트가 없어요.`
+        : '내가 담당하는 프로젝트가 없어요. 다른 브랜드 칩을 눌러서 보세요.';
+    }
     else { const b = brand(f); msg = `${b ? esc(b.name) + ' 브랜드' : '선택한 필터'}의 진행 중 프로젝트가 없어요.`; }
-    return `${renderPjFilterBar(f)}<div class="empty"><div class="ei">◇</div>${msg}</div>`;
+    return `${renderPjFilterBar(f)}${doneSearchHtml}${f === 'mine' && hiddenCount > 0 ? renderHiddenToggle(hiddenCount, false) : ''}<div class="empty"><div class="ei">◇</div>${msg}</div>`;
+  }
+
+  // === MINE VIEW: brand-grouped accordion sidebar ===
+  if (f === 'mine') {
+    const selected = filtered.find(p => p.id === session.selectedProjectId);
+    return `
+      ${renderPjFilterBar(f)}
+      ${renderHiddenToggle(hiddenCount, !!session.showHiddenInMine)}
+      <div class="pj-page">${renderPjSidebarGrouped(selected, filtered, hiddenSet)}${renderPjDetail(selected)}</div>
+    `;
   }
 
   const selected = filtered.find(p => p.id === session.selectedProjectId);
   return `
     ${renderPjFilterBar(f)}
+    ${doneSearchHtml}
     <div class="pj-page">${renderPjSidebar(selected, filtered, f)}${renderPjDetail(selected)}</div>
+  `;
+}
+
+// Toggle button for showing hidden projects in 내 프로젝트
+function renderHiddenToggle(hiddenCount, isShowingHidden) {
+  if (hiddenCount === 0 && !isShowingHidden) return '';
+  if (isShowingHidden) {
+    return `
+      <div class="hidden-toggle-bar">
+        <span class="hidden-toggle-info">👁 숨긴 프로젝트도 함께 보고 있어요</span>
+        <button class="btn btn-secondary btn-sm" data-action="toggle-show-hidden">숨기기</button>
+      </div>
+    `;
+  }
+  return `
+    <div class="hidden-toggle-bar">
+      <span class="hidden-toggle-info">🙈 숨긴 프로젝트 ${hiddenCount}개</span>
+      <button class="btn btn-secondary btn-sm" data-action="toggle-show-hidden">보기</button>
+    </div>
+  `;
+}
+
+// Sidebar grouped by brand (for 내 프로젝트 view)
+function renderPjSidebarGrouped(selected, projects, hiddenSet) {
+  // Group projects by brand
+  const byBrand = {}; // brandId -> [projects]
+  const noBrand = [];
+  projects.forEach(p => {
+    if (p.brandId) {
+      if (!byBrand[p.brandId]) byBrand[p.brandId] = [];
+      byBrand[p.brandId].push(p);
+    } else {
+      noBrand.push(p);
+    }
+  });
+
+  // Brand groups in state.brands order; only brands that have projects
+  const brandGroups = state.brands
+    .filter(b => byBrand[b.id]?.length > 0)
+    .map(b => ({ brand: b, projects: byBrand[b.id] }));
+
+  // Collapse state per brand (transient, in-memory; defaults to expanded)
+  window._mineBrandCollapsed = window._mineBrandCollapsed || new Set();
+  const collapsedSet = window._mineBrandCollapsed;
+
+  function projItemHtml(p) {
+    const tasks = state.tasks.filter(t => t.projectId === p.id);
+    const done = tasks.filter(t => isTaskDoneOn(t, todayStr())).length;
+    const pct = tasks.length ? Math.round(done/tasks.length*100) : 0;
+    const isHidden = hiddenSet.has(p.id);
+    return `
+      <div class="pj-list-item ${selected && p.id === selected.id ? 'active' : ''} ${isHidden ? 'is-hidden' : ''}" data-action="select-project" data-id="${p.id}">
+        <div class="pji-title-row">
+          <span class="pji-dot"${isHidden?' style="background:var(--text-light)"':''}></span>
+          <span class="pji-title">${esc(p.name)}${isHidden?' <span class="pji-hidden-tag">숨김</span>':''}</span>
+          <span class="pji-action-btn" data-action="${isHidden?'unhide-project':'hide-project'}" data-id="${p.id}" title="${isHidden?'다시 보이기':'숨기기'}">${isHidden?'👁':'🙈'}</span>
+        </div>
+        <div class="pji-progress">
+          <div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>
+          <span class="pji-progress-text">${done}/${tasks.length}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <aside class="pj-sidebar">
+      <div class="pj-sidebar-head">⭐ 내 프로젝트</div>
+      <div class="pj-sidebar-sub">${projects.length}개 프로젝트</div>
+      ${brandGroups.map(g => {
+        const isCollapsed = collapsedSet.has(g.brand.id);
+        return `
+          <div class="pj-brand-group ${isCollapsed?'collapsed':''}">
+            <div class="pj-brand-group-head" data-action="toggle-mine-brand" data-id="${g.brand.id}" style="--brand-color:${g.brand.color}">
+              <span class="pj-bg-arrow">${isCollapsed?'▶':'▼'}</span>
+              <span class="pj-bg-dot" style="background:${g.brand.color}"></span>
+              <span class="pj-bg-name">${esc(g.brand.name)}</span>
+              <span class="pj-bg-count">${g.projects.length}</span>
+            </div>
+            ${isCollapsed ? '' : `<div class="pj-brand-group-list">${g.projects.map(projItemHtml).join('')}</div>`}
+          </div>
+        `;
+      }).join('')}
+      ${noBrand.length > 0 ? (() => {
+        const isCollapsed = collapsedSet.has('__none__');
+        return `
+          <div class="pj-brand-group ${isCollapsed?'collapsed':''}">
+            <div class="pj-brand-group-head" data-action="toggle-mine-brand" data-id="__none__" style="--brand-color:var(--text-light)">
+              <span class="pj-bg-arrow">${isCollapsed?'▶':'▼'}</span>
+              <span class="pj-bg-dot" style="background:var(--text-light)"></span>
+              <span class="pj-bg-name" style="color:var(--text-muted)">미지정</span>
+              <span class="pj-bg-count">${noBrand.length}</span>
+            </div>
+            ${isCollapsed ? '' : `<div class="pj-brand-group-list">${noBrand.map(projItemHtml).join('')}</div>`}
+          </div>
+        `;
+      })() : ''}
+    </aside>
   `;
 }
 
@@ -2280,11 +2515,12 @@ function renderPjFilterBar(active) {
   const meId = session.currentUserId;
   const myProjectIds = new Set(state.tasks.filter(t => t.assigneeId === meId).map(t => t.projectId).filter(Boolean));
   const counts = {
-    all: state.projects.filter(p => p.status !== 'done').length,
+    all: state.projects.filter(p => p.status === 'active').length,
     done: state.projects.filter(p => p.status === 'done').length,
-    mine: state.projects.filter(p => p.status !== 'done' && myProjectIds.has(p.id)).length,
+    paused: state.projects.filter(p => p.status === 'paused').length,
+    mine: state.projects.filter(p => p.status === 'active' && myProjectIds.has(p.id)).length,
   };
-  state.brands.forEach(b => { counts[b.id] = state.projects.filter(p => p.brandId === b.id && p.status !== 'done').length; });
+  state.brands.forEach(b => { counts[b.id] = state.projects.filter(p => p.brandId === b.id && p.status === 'active').length; });
   return `
     <div class="pj-filter-bar">
       <span class="pj-filter-chip pj-filter-mine ${active==='mine'?'active':''}" data-action="pj-filter" data-brand="mine">⭐ 내 프로젝트<span class="pj-filter-count">${counts.mine}</span></span>
@@ -2293,6 +2529,7 @@ function renderPjFilterBar(active) {
         <span class="pj-filter-chip ${active===b.id?'active':''}" data-action="pj-filter" data-brand="${b.id}" style="${active===b.id?`background:${b.color};border-color:${b.color};color:white`:''}">${esc(b.name)}<span class="pj-filter-count">${counts[b.id]}</span></span>
       `).join('')}
       <span class="pj-filter-divider"></span>
+      <span class="pj-filter-chip pj-filter-paused ${active==='paused'?'active':''}" data-action="pj-filter" data-brand="paused">⏸ 보류<span class="pj-filter-count">${counts.paused}</span></span>
       <span class="pj-filter-chip pj-filter-done ${active==='done'?'active':''}" data-action="pj-filter" data-brand="done">📦 완료됨<span class="pj-filter-count">${counts.done}</span></span>
     </div>
   `;
@@ -2301,21 +2538,26 @@ function renderPjFilterBar(active) {
 function renderPjSidebar(selected, projects, filter) {
   const list = projects || state.projects;
   const isDone = filter === 'done';
+  const isPaused = filter === 'paused';
   const allProjTasks = state.tasks.filter(t => list.some(p => p.id === t.projectId));
   const allDone = allProjTasks.filter(t => isTaskDoneOn(t, todayStr())).length;
+  const headerLabel = isDone ? '📦 완료된 프로젝트' : isPaused ? '⏸ 보류된 프로젝트' : '📁 프로젝트 목록';
+  const subUnit = isDone ? '완료' : isPaused ? '보류' : '프로젝트';
   return `
     <aside class="pj-sidebar">
-      <div class="pj-sidebar-head">${isDone ? '📦 완료된 프로젝트' : '📁 프로젝트 목록'}</div>
-      <div class="pj-sidebar-sub">${list.length}개 ${isDone ? '완료' : '프로젝트'} · ${allDone}/${allProjTasks.length} 업무 완료</div>
+      <div class="pj-sidebar-head">${headerLabel}</div>
+      <div class="pj-sidebar-sub">${list.length}개 ${subUnit} · ${allDone}/${allProjTasks.length} 업무 완료</div>
+      ${list.length === 0 ? '<div class="pj-sidebar-empty">결과가 없어요</div>' : ''}
       ${list.map(p => {
         const tasks = state.tasks.filter(t => t.projectId === p.id);
         const done = tasks.filter(t => isTaskDoneOn(t, todayStr())).length;
         const pct = tasks.length ? Math.round(done/tasks.length*100) : 0;
         const b = brand(p.brandId);
+        const dotColor = isDone ? '#9c9a92' : isPaused ? 'var(--warning)' : '';
         return `
-          <div class="pj-list-item ${p.id === selected.id ? 'active' : ''}" data-action="select-project" data-id="${p.id}">
+          <div class="pj-list-item ${selected && p.id === selected.id ? 'active' : ''}" data-action="select-project" data-id="${p.id}">
             <div class="pji-title-row">
-              <span class="pji-dot" style="${isDone?'background:#9c9a92':''}"></span>
+              <span class="pji-dot" style="${dotColor?`background:${dotColor}`:''}"></span>
               <span class="pji-title">${esc(p.name)}</span>
               <span class="pji-del" data-action="delete-project" data-id="${p.id}" title="삭제">✕</span>
             </div>
@@ -2349,10 +2591,15 @@ function renderPjDetail(p) {
           <h1>${esc(p.name)}</h1>
           <div class="badges">
             <span class="badge ${PROJ_STATUS[p.status].cls}">${PROJ_STATUS[p.status].label}</span>
-            ${p.status === 'done'
-              ? `<button class="btn btn-secondary btn-sm" data-action="reopen-project" data-id="${p.id}">↺ 되돌리기</button>`
-              : `<button class="btn btn-secondary btn-sm" data-action="complete-project" data-id="${p.id}" style="color:var(--success);border-color:var(--success)">✓ 완료</button>`
-            }
+            ${p.status === 'done' ? `
+              <button class="btn btn-secondary btn-sm" data-action="reopen-project" data-id="${p.id}">↺ 되돌리기</button>
+            ` : p.status === 'paused' ? `
+              <button class="btn btn-secondary btn-sm" data-action="resume-project" data-id="${p.id}" style="color:var(--info);border-color:var(--info)">▶ 재개</button>
+              <button class="btn btn-secondary btn-sm" data-action="complete-project" data-id="${p.id}" style="color:var(--success);border-color:var(--success)">✓ 완료</button>
+            ` : `
+              <button class="btn btn-secondary btn-sm" data-action="pause-project" data-id="${p.id}" style="color:var(--warning);border-color:var(--warning)">⏸ 보류</button>
+              <button class="btn btn-secondary btn-sm" data-action="complete-project" data-id="${p.id}" style="color:var(--success);border-color:var(--success)">✓ 완료</button>
+            `}
             <button class="btn btn-secondary btn-sm" data-action="open-project-modal" data-id="${p.id}">편집</button>
             <button class="btn btn-ghost btn-sm" data-action="delete-project" data-id="${p.id}" style="color:var(--danger)">삭제</button>
           </div>
@@ -3207,14 +3454,17 @@ function renderGoalsKpiTree(kpis, projsByKpi, userId) {
     const p = kpiProgress(k);
     const pct = p.pct;
     const projs = projsByKpi[k.id] || [];
+    const br = brand(k.brandId);
+    const dotColor = br?.color || 'var(--text-light)';
     return `
       <div class="gl-kpi">
         <div class="gl-kpi-head">
-          <span class="gl-kpi-dot"></span>
+          <span class="gl-kpi-dot" style="background:${dotColor}"></span>
+          ${br ? `<span class="gl-kpi-brand-tag" style="background:${br.color}1a;color:${br.color}">${esc(br.name)}</span>` : '<span class="gl-kpi-brand-tag" style="background:var(--surface-soft);color:var(--text-muted)">미지정</span>'}
           <span class="gl-kpi-name">${esc(k.title)}${p.isAuto ? ' <span class="kpi-auto-badge">자동</span>' : ''}</span>
           <span class="gl-kpi-sub">${p.current}/${p.target} ${esc(p.unit || '')}</span>
           <div class="gl-kpi-bar-wrap">
-            <div class="gl-kpi-bar"><div style="width:${pct}%"></div></div>
+            <div class="gl-kpi-bar"><div style="width:${pct}%;background:${dotColor}"></div></div>
             <span class="gl-kpi-pct">${pct}%</span>
           </div>
         </div>
@@ -3748,6 +3998,7 @@ async function actionBackupRestore(backup) {
     if (!Array.isArray(state.log)) state.log = [];
     if (!state.setup) state.setup = { completed: true, teamName: '' };
     if (!state.goals) state.goals = {};
+    if (!state.hiddenProjectsByUser || typeof state.hiddenProjectsByUser !== 'object') state.hiddenProjectsByUser = {};
 
     logAct(`백업에서 복원: ${backup.exportedAt ? new Date(backup.exportedAt).toLocaleDateString('ko-KR') : '알 수 없음'}`);
     await saveState();
@@ -4034,7 +4285,17 @@ function openTaskModal(taskId, defaults = {}) {
   const type = t?.type || defaults.type || 'oneoff';
   const date = t?.date || defaults.date || session.selectedDate || todayStr();
   const projOptions = '<option value="">없음</option>' + state.projects.map(p => `<option value="${p.id}" ${t?.projectId===p.id?'selected':''}>${esc(p.name)}</option>`).join('');
-  const kpiOptions = '<option value="">없음</option>' + state.kpis.map(k => `<option value="${k.id}" ${t?.kpiId===k.id?'selected':''}>${esc(k.title)}</option>`).join('');
+  // KPI dropdown — filtered by selected brand
+  const taskBrandId = t?.brandId || '';
+  function buildTaskKpiOptions(brandId, currentKpiId) {
+    const filteredKpis = brandId
+      ? state.kpis.filter(k => k.brandId === brandId)
+      : state.kpis.filter(k => !k.brandId);
+    return '<option value="">없음</option>' +
+      filteredKpis.map(k => `<option value="${k.id}" ${currentKpiId===k.id?'selected':''}>${esc(k.title)}</option>`).join('');
+  }
+  const kpiOptions = buildTaskKpiOptions(taskBrandId, t?.kpiId);
+  window._buildTaskKpiOptions = buildTaskKpiOptions;
   const TYPE_LABELS = { oneoff: '단일 업무', daily: '일일 루틴', weekly: '주간 루틴', longterm: '장기 프로젝트' };
   const typeLabel = TYPE_LABELS[type];
   const html = `
@@ -4050,10 +4311,10 @@ function openTaskModal(taskId, defaults = {}) {
           ${type === 'oneoff' ? `<div class="form-row"><label>날짜</label><input type="date" name="date" value="${date}"></div>` : ''}
           <div class="form-row"><label>설명 / 기록</label><textarea name="desc" placeholder="상세 내용, 진행 기록 등">${esc(t?.desc || '')}</textarea></div>
           <div class="form-row row-2">
-            <div><label>브랜드</label><select name="brandId"><option value="">없음</option>${state.brands.map(b => `<option value="${b.id}" ${t?.brandId===b.id?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div>
+            <div><label>브랜드</label><select name="brandId" onchange="window.handleTaskBrandChange(this)"><option value="">없음</option>${state.brands.map(b => `<option value="${b.id}" ${t?.brandId===b.id?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div>
             <div><label>연결 프로젝트</label><select name="projectId">${projOptions}</select></div>
           </div>
-          <div class="form-row"><label>연결 KPI</label><select name="kpiId">${kpiOptions}</select></div>
+          <div class="form-row"><label>연결 KPI</label><select name="kpiId" id="task-kpi-select">${kpiOptions}</select></div>
         </form>
       </div>
       <div class="modal-footer">
@@ -4080,7 +4341,18 @@ function openProjectModal(projId) {
   }
   const selectedBrandId = isEdit ? (p?.brandId || '') : defaultBrandId;
   const tasks = p ? state.tasks.filter(t => t.projectId === p.id) : [];
-  const kpiOptions = '<option value="">없음</option>' + state.kpis.map(k => `<option value="${k.id}" ${p?.kpiId===k.id?'selected':''}>${esc(k.title)}</option>`).join('');
+  // KPI dropdown — filtered by selected brand
+  function buildProjectKpiOptions(brandId, currentKpiId) {
+    const filteredKpis = brandId
+      ? state.kpis.filter(k => k.brandId === brandId)
+      : state.kpis.filter(k => !k.brandId); // 브랜드 없음 → 미지정 KPI만
+    const opts = '<option value="">없음</option>' +
+      filteredKpis.map(k => `<option value="${k.id}" ${currentKpiId===k.id?'selected':''}>${esc(k.title)}</option>`).join('');
+    return opts || '<option value="">없음</option>';
+  }
+  const kpiOptions = buildProjectKpiOptions(selectedBrandId, p?.kpiId);
+  // Expose for inline brand-change handler
+  window._buildProjectKpiOptions = buildProjectKpiOptions;
   const tasksHtml = isEdit ? `
     <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -4102,8 +4374,8 @@ function openProjectModal(projId) {
             <div><label>종료(예정)</label><input type="date" name="end" value="${p?.end?p.end.slice(0,10):''}"></div>
           </div>
           <div class="form-row row-2">
-            <div><label>브랜드</label><select name="brandId" ${isEdit?'':'onchange="updateProjectTemplatePicker(this.value)"'}><option value="">없음</option>${state.brands.map(b => `<option value="${b.id}" ${selectedBrandId===b.id?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div>
-            <div><label>연결 KPI</label><select name="kpiId">${kpiOptions}</select></div>
+            <div><label>브랜드</label><select name="brandId" onchange="window.handleProjectBrandChange(this)"><option value="">없음</option>${state.brands.map(b => `<option value="${b.id}" ${selectedBrandId===b.id?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div>
+            <div><label>연결 KPI</label><select name="kpiId" id="project-kpi-select">${kpiOptions}</select></div>
           </div>
         </form>
         ${tasksHtml}
@@ -4384,6 +4656,10 @@ async function actionDeleteProject(id) {
       moveToTrash('project', p, { taskIds: taskLinks });
       state.projects = state.projects.filter(x => x.id !== id);
       state.tasks.forEach(t => { if (t.projectId === id) t.projectId = null; });
+      // Clean up hidden references for this project across all users
+      Object.keys(state.hiddenProjectsByUser || {}).forEach(uid => {
+        state.hiddenProjectsByUser[uid] = (state.hiddenProjectsByUser[uid] || []).filter(pid => pid !== id);
+      });
       logAct(`프로젝트 삭제: ${p.name}`);
       closeModal(); await saveState(); render();
     },
@@ -4900,6 +5176,44 @@ window.updateProjectTemplatePicker = function(brandId) {
   }
 };
 
+// Combined handler for brand change in project modal:
+// 1) Refresh KPI dropdown to show only KPIs of selected brand
+// 2) Refresh template picker (if in new-project mode)
+window.handleProjectBrandChange = function(selectEl) {
+  const brandId = selectEl.value;
+  // 1. Refresh KPI dropdown
+  const kpiSelect = document.getElementById('project-kpi-select');
+  if (kpiSelect && window._buildProjectKpiOptions) {
+    // Preserve selection if KPI is still valid for this brand
+    const currentValue = kpiSelect.value;
+    const validKpiIds = new Set(
+      brandId
+        ? state.kpis.filter(k => k.brandId === brandId).map(k => k.id)
+        : state.kpis.filter(k => !k.brandId).map(k => k.id)
+    );
+    const keepValue = validKpiIds.has(currentValue) ? currentValue : '';
+    kpiSelect.innerHTML = window._buildProjectKpiOptions(brandId, keepValue);
+  }
+  // 2. Refresh template picker (only present in new-project mode)
+  window.updateProjectTemplatePicker(brandId);
+};
+
+// Brand change handler for task modal — refresh KPI dropdown
+window.handleTaskBrandChange = function(selectEl) {
+  const brandId = selectEl.value;
+  const kpiSelect = document.getElementById('task-kpi-select');
+  if (kpiSelect && window._buildTaskKpiOptions) {
+    const currentValue = kpiSelect.value;
+    const validKpiIds = new Set(
+      brandId
+        ? state.kpis.filter(k => k.brandId === brandId).map(k => k.id)
+        : state.kpis.filter(k => !k.brandId).map(k => k.id)
+    );
+    const keepValue = validKpiIds.has(currentValue) ? currentValue : '';
+    kpiSelect.innerHTML = window._buildTaskKpiOptions(brandId, keepValue);
+  }
+};
+
 async function actionSaveTeamName() {
   const v = document.getElementById('team-name-input').value.trim();
   if (v) state.setup.teamName = v;
@@ -5042,8 +5356,37 @@ async function actionSelectProject(id) {
 async function actionPjFilter(brandId) {
   session.projectBrandFilter = brandId;
   session.selectedProjectId = null;
+  // Reset done/paused-view sub-filters when switching to a different filter
+  if (brandId !== 'done' && brandId !== 'paused') {
+    session.doneBrandFilter = null;
+    session.doneSearch = '';
+  }
+  // Reset showHiddenInMine when leaving 내 프로젝트
+  if (brandId !== 'mine') {
+    session.showHiddenInMine = false;
+  }
   render();
 }
+
+// Search handler for done view (debounced via simple timer)
+let _doneSearchTimer = null;
+window.handleDoneSearch = function(value) {
+  session.doneSearch = value;
+  // Debounce render slightly so typing isn't laggy
+  clearTimeout(_doneSearchTimer);
+  _doneSearchTimer = setTimeout(() => {
+    session.selectedProjectId = null; // reset selection on search
+    render();
+    // Re-focus the search input + put cursor at end
+    setTimeout(() => {
+      const el = document.querySelector('.done-search');
+      if (el) {
+        el.focus();
+        el.setSelectionRange(el.value.length, el.value.length);
+      }
+    }, 0);
+  }, 200);
+};
 async function actionKpiFilter(brandId) {
   session.kpiBrandFilter = brandId;
   // Reset transient accordion state when switching filter view
@@ -5072,6 +5415,31 @@ async function actionReopenProject(id) {
   logAct(`프로젝트 재개: ${p.name}`);
   session.selectedProjectId = null;
   session.projectBrandFilter = 'all';
+  await saveState(); render();
+}
+async function actionPauseProject(id) {
+  const p = state.projects.find(x => x.id === id);
+  if (!p) return;
+  showConfirm({
+    title: '프로젝트를 보류로 설정할까요?',
+    message: `"${esc(p.name)}"<br>보류 탭에서 다시 볼 수 있고, 언제든 재개할 수 있어요.`,
+    confirmText: '보류',
+    onConfirm: async () => {
+      p.status = 'paused';
+      logAct(`프로젝트 보류: ${p.name}`);
+      session.selectedProjectId = null;
+      await saveState(); render();
+    },
+  });
+}
+async function actionResumeProject(id) {
+  const p = state.projects.find(x => x.id === id);
+  if (!p) return;
+  p.status = 'active';
+  logAct(`프로젝트 재개: ${p.name}`);
+  session.selectedProjectId = null;
+  // Switch to "내 프로젝트" view so the resumed project shows up there
+  session.projectBrandFilter = 'mine';
   await saveState(); render();
 }
 async function actionPjTab(tab) {
@@ -5276,9 +5644,44 @@ document.addEventListener('click', async (e) => {
     case 'select-project': return actionSelectProject(id);
     case 'pj-tab': return actionPjTab(target.dataset.tab);
     case 'pj-filter': return actionPjFilter(target.dataset.brand);
+    case 'done-brand-filter': {
+      session.doneBrandFilter = id;
+      session.selectedProjectId = null;
+      return render();
+    }
+    case 'toggle-show-hidden': {
+      session.showHiddenInMine = !session.showHiddenInMine;
+      return render();
+    }
+    case 'toggle-mine-brand': {
+      window._mineBrandCollapsed = window._mineBrandCollapsed || new Set();
+      if (window._mineBrandCollapsed.has(id)) window._mineBrandCollapsed.delete(id);
+      else window._mineBrandCollapsed.add(id);
+      return render();
+    }
+    case 'hide-project': {
+      const meId = session.currentUserId;
+      if (!state.hiddenProjectsByUser[meId]) state.hiddenProjectsByUser[meId] = [];
+      if (!state.hiddenProjectsByUser[meId].includes(id)) {
+        state.hiddenProjectsByUser[meId].push(id);
+        if (session.selectedProjectId === id) session.selectedProjectId = null;
+        await saveState();
+      }
+      return render();
+    }
+    case 'unhide-project': {
+      const meId = session.currentUserId;
+      if (state.hiddenProjectsByUser[meId]) {
+        state.hiddenProjectsByUser[meId] = state.hiddenProjectsByUser[meId].filter(pid => pid !== id);
+        await saveState();
+      }
+      return render();
+    }
     case 'kpi-filter': return actionKpiFilter(target.dataset.brand);
     case 'complete-project': return actionCompleteProject(id);
     case 'reopen-project': return actionReopenProject(id);
+    case 'pause-project': return actionPauseProject(id);
+    case 'resume-project': return actionResumeProject(id);
     case 'save-project': return actionSaveProject(id);
     case 'delete-project': return actionDeleteProject(id);
     case 'add-note': return actionAddNote(id);
