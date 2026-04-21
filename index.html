@@ -841,6 +841,50 @@
   .trash-empty .ei { font-size: 44px; margin-bottom: 14px; opacity: 0.4; }
   .trash-empty .eih { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
 
+  /* === Backup / Restore Page === */
+  .backup-page { max-width: 1100px; }
+  .backup-status { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-radius: 12px; margin-bottom: 22px; border: 1px solid var(--border); }
+  .backup-status.ok { background: var(--success-soft); border-color: var(--success); }
+  .backup-status.warn { background: var(--warning-soft); border-color: var(--warning); }
+  .backup-status.urgent { background: var(--danger-soft); border-color: var(--danger); }
+  .backup-status-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; flex-shrink: 0; }
+  .backup-status.ok .backup-status-icon { background: var(--success); color: white; }
+  .backup-status.warn .backup-status-icon { background: var(--warning); color: white; }
+  .backup-status.urgent .backup-status-icon { background: var(--danger); color: white; }
+  .backup-status-main { flex: 1; min-width: 0; }
+  .backup-status-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .backup-status-sub { font-size: 12px; color: var(--text-muted); }
+
+  .backup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; }
+  @media (max-width: 900px) { .backup-grid { grid-template-columns: 1fr; } }
+
+  .backup-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; box-shadow: var(--shadow-sm); }
+  .backup-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .backup-card-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .backup-card-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .backup-card-desc { font-size: 12.5px; color: var(--text-muted); }
+
+  .backup-counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; padding: 14px; background: var(--surface-soft); border-radius: 8px; }
+  .backup-count { text-align: center; }
+  .bc-num { display: block; font-size: 18px; font-weight: 800; color: var(--text); line-height: 1.1; }
+  .bc-lbl { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .backup-action-btn { width: 100%; padding: 12px; font-size: 13.5px; font-weight: 700; }
+
+  .backup-card-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 10px; line-height: 1.55; padding: 8px 10px; background: var(--bg-2); border-radius: 6px; }
+
+  .backup-dropzone { border: 2px dashed var(--border); border-radius: 10px; padding: 30px 20px; text-align: center; transition: all 0.15s; margin-bottom: 12px; }
+  .backup-dropzone:hover { border-color: var(--primary); background: var(--primary-soft); }
+  .backup-dropzone.dragover { border-color: var(--primary); background: var(--primary-soft); transform: scale(1.01); }
+  .backup-dropzone .bd-icon { font-size: 38px; margin-bottom: 10px; opacity: 0.5; }
+  .backup-dropzone .bd-title { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .backup-dropzone .bd-or { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+
+  .backup-tips { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; }
+  .backup-tips-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+  .backup-tips ul { margin: 0; padding-left: 20px; color: var(--text-muted); font-size: 13px; line-height: 1.85; }
+  .backup-tips li { margin-bottom: 4px; }
+
   /* Note images */
   .pj-note-images { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .pj-note-img { max-width: 200px; max-height: 200px; border-radius: 6px; cursor: zoom-in; border: 1px solid var(--border); object-fit: cover; transition: transform 0.12s; }
@@ -933,7 +977,7 @@
   .kpi-dash-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
   .kpi-dash-bar > div { height: 100%; border-radius: 4px; transition: width 0.4s; }
 
-  .kpi-dash-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  .kpi-dash-btns { display: grid; grid-template-columns: 1fr; gap: 7px; }
   .kpi-dash-btn { padding: 7px 8px; font-size: 11.5px; font-weight: 700; border-radius: 7px; cursor: pointer; transition: all 0.12s; border: 1.5px solid; display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; letter-spacing: -0.005em; }
   .kpi-dash-btn.primary { color: white; }
   .kpi-dash-btn.primary:hover { filter: brightness(1.08); }
@@ -941,11 +985,14 @@
   .kpi-dash-btn.outline:hover { background: var(--surface-soft); }
 
   .kpi-dash-kpis { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }
-  .kpi-dash-kitem { padding: 10px 0; transition: background 0.12s; border-radius: 5px; position: relative; cursor: pointer; }
-  .kpi-dash-kitem:hover { background: rgba(99,102,241,0.04); margin: 0 -6px; padding-left: 6px; padding-right: 6px; }
+  .kpi-dash-kitem { padding: 10px 0; transition: background 0.12s; border-radius: 5px; position: relative; }
+  .kpi-dash-kitem[data-action]:hover { background: rgba(99,102,241,0.04); margin: 0 -6px; padding-left: 6px; padding-right: 6px; }
   .kpi-dash-kitem:hover .kpi-dash-kitem-edit { opacity: 1; }
+  .kpi-dash-kitem.force-open { padding: 0; }
+  .kpi-dash-kitem.force-open:hover { background: transparent; margin: 0; padding: 0; }
   .kpi-dash-kitem-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
-  .kpi-dash-kitem-arrow { color: var(--text-light); font-size: 9px; flex-shrink: 0; }
+  .kpi-dash-kitem-arrow { color: var(--text-light); font-size: 9px; flex-shrink: 0; display: inline-block; width: 12px; text-align: center; }
+  .kpi-dash-kitem.open .kpi-dash-kitem-arrow { color: var(--primary); }
   .kpi-dash-kitem-title { font-size: 14px; color: var(--text); font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -0.01em; }
   .kpi-dash-kitem-val { font-size: 12.5px; color: var(--text-muted); font-weight: 500; flex-shrink: 0; white-space: nowrap; }
   .kpi-dash-kitem-val .knum { font-size: 14px; font-weight: 800; color: var(--text); }
@@ -958,8 +1005,16 @@
   .kpi-dash-kitem-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
   .kpi-dash-kitem-bar > div { height: 100%; border-radius: 2px; }
 
-  .kpi-dash-kitem.open .kpi-dash-kitem-arrow { transform: rotate(90deg); color: var(--primary); }
-  .kpi-dash-kitem-arrow { transition: transform 0.15s; display: inline-block; }
+  /* (Arrow CSS defined above with .kpi-dash-kitem-arrow) */
+
+  /* Explicit toggle button (replaces row-click toggle) */
+  .kpi-dash-kitem-toggle {
+    background: transparent; border: none; padding: 4px 6px; cursor: pointer;
+    color: var(--text-light); font-size: 10px; flex-shrink: 0; border-radius: 4px;
+    line-height: 1; transition: all 0.12s;
+  }
+  .kpi-dash-kitem-toggle:hover { background: var(--surface-soft); color: var(--primary); }
+  .kpi-dash-kitem.open .kpi-dash-kitem-toggle { color: var(--primary); }
 
   /* Accordion panel */
   .kpi-dash-accordion { margin-top: 10px; padding: 12px 12px 6px; background: var(--surface-soft); border-radius: 8px; border: 1px solid var(--border); }
@@ -1533,6 +1588,8 @@ function render() {
   if (!session.currentUserId || !member(session.currentUserId)) { root.innerHTML = renderLogin(); return; }
   root.innerHTML = renderApp();
   if (session.modal) renderModal();
+  // Page-specific post-render hooks
+  if (session.view === 'backup') setTimeout(attachBackupDropzone, 0);
 }
 
 // ====== SETUP ======
@@ -1675,17 +1732,30 @@ function renderLogin() {
 async function actionLogin(id) { session.currentUserId = id; await saveSession(); render(); }
 async function actionLogout() { session.currentUserId = null; render(); }
 async function actionResetSetup() {
-  if (!confirm('팀 정보를 다시 설정하시겠어요? 기존 업무·프로젝트 데이터는 유지됩니다.')) return;
-  state.setup.completed = false;
-  state.members = [];
-  await saveState(); render();
+  showConfirm({
+    title: '팀 정보를 다시 설정할까요?',
+    message: '기존 업무·프로젝트 데이터는 유지됩니다.',
+    confirmText: '다시 설정',
+    onConfirm: async () => {
+      state.setup.completed = false;
+      state.members = [];
+      await saveState(); render();
+    },
+  });
 }
 async function actionResetAll() {
-  if (!confirm('정말 모든 데이터(업무·프로젝트·회의록·요청·KPI·팀원·브랜드)를 초기화할까요? 되돌릴 수 없습니다.')) return;
-  state = initialState();
-  state.brands = JSON.parse(JSON.stringify(DEFAULT_BRANDS));
-  session.currentUserId = null;
-  await saveState(); await saveSession(); render();
+  showConfirm({
+    title: '모든 데이터를 초기화할까요?',
+    message: '업무·프로젝트·회의록·요청·KPI·팀원·브랜드 등 <strong>모든 데이터</strong>가 사라집니다.<br>이 작업은 되돌릴 수 없어요.',
+    confirmText: '전체 초기화',
+    danger: true,
+    onConfirm: async () => {
+      state = initialState();
+      state.brands = JSON.parse(JSON.stringify(DEFAULT_BRANDS));
+      session.currentUserId = null;
+      await saveState(); await saveSession(); render();
+    },
+  });
 }
 
 // ====== APP SHELL ======
@@ -1731,6 +1801,7 @@ function renderSidebar() {
         { id: 'templates', icon: '📋', label: '업무 템플릿' },
         { id: 'team', icon: '○', label: '팀원' },
         { id: 'trash', icon: '🗑', label: '휴지통' },
+        { id: 'backup', icon: '💾', label: '백업/복원' },
       ]
     },
   ];
@@ -1761,7 +1832,7 @@ function renderSidebar() {
 }
 
 function renderTopbar() {
-  const titles = { dashboard: '대시보드', tasks: '업무', projects: '프로젝트', meetings: '회의록', requests: '타팀 요청', kpis: 'KPI / 목표', goals: '내 연간 목표', templates: '업무 템플릿', team: '팀원', trash: '휴지통' };
+  const titles = { dashboard: '대시보드', tasks: '업무', projects: '프로젝트', meetings: '회의록', requests: '타팀 요청', kpis: 'KPI / 목표', goals: '내 연간 목표', templates: '업무 템플릿', team: '팀원', trash: '휴지통', backup: '백업/복원' };
   const actions = {
     projects: '<button class="btn btn-primary" data-action="new-project">+ 새 프로젝트</button>',
     meetings: '<button class="btn btn-primary" data-action="new-meeting">+ 새 회의록</button>',
@@ -1789,6 +1860,7 @@ function renderView() {
     case 'templates': return renderTemplates();
     case 'team': return renderTeam();
     case 'trash': return renderTrash();
+    case 'backup': return renderBackup();
     default: return '';
   }
 }
@@ -2713,7 +2785,6 @@ function renderKPIs() {
   const isFiltered = f !== 'all';
 
   const noKpiKpis = state.kpis.filter(k => !k.brandId);
-  session.kpiCollapsed = session.kpiCollapsed || {};
 
   // Helper: render single KPI item with accordion expansion
   // 전체 view: collapsed by default, click row to toggle
@@ -2786,15 +2857,14 @@ function renderKPIs() {
       `;
     }
 
-    // 전체 view: row toggles accordion. Detail view: not clickable.
-    const itemAction = forceOpen ? '' : `data-action="kpi-item-toggle" data-id="${k.id}"`;
+    // 전체 view: entire row toggles accordion. Only ✎ opens edit modal.
     return `
-      <div class="kpi-dash-kitem ${isOpen?'open':''} ${forceOpen?'force-open':''}" ${itemAction}>
+      <div class="kpi-dash-kitem ${isOpen?'open':''} ${forceOpen?'force-open':''}" ${forceOpen?'':`data-action="kpi-item-toggle" data-id="${k.id}" style="cursor:pointer"`}>
         <div class="kpi-dash-kitem-row">
-          ${forceOpen ? '' : '<span class="kpi-dash-kitem-arrow">▶</span>'}
+          ${forceOpen ? '' : `<span class="kpi-dash-kitem-arrow">${isOpen?'▼':'▶'}</span>`}
           <span class="kpi-dash-kitem-title">${esc(k.title)}${p.isAuto ? ' <span class="kpi-auto-badge">자동</span>' : ''}</span>
           <span class="kpi-dash-kitem-val"><span class="knum">${p.current}</span> / ${p.target} ${esc(p.unit)}</span>
-          <button class="kpi-dash-kitem-edit" data-action="open-kpi" data-id="${k.id}" title="수정">✎</button>
+          <button class="kpi-dash-kitem-edit" data-action="open-kpi" data-id="${k.id}" title="수정" onclick="event.stopPropagation()">✎</button>
           <span class="kpi-dash-kitem-pct ${kCls}">${pct}%</span>
         </div>
         <div class="kpi-dash-kitem-bar"><div style="width:${pct}%;background:${kBar}"></div></div>
@@ -2808,10 +2878,7 @@ function renderKPIs() {
     const hasKpis = bKpis.length > 0;
     const avg = hasKpis ? Math.round(bKpis.reduce((s,k) => s + kpiProgress(k).pct, 0) / bKpis.length) : 0;
     const pctCls = !hasKpis ? 'none' : avg >= 80 ? 'hi' : avg >= 40 ? 'mid' : 'lo';
-    const barColor = avg >= 80 ? 'var(--success)' : avg >= 40 ? 'var(--primary)' : 'var(--danger)';
     const goalText = b.goal || '';
-    // In filtered (single-brand) mode: always expanded, no toggle/detail buttons
-    const collapsed = isFiltered ? false : !!session.kpiCollapsed[b.id];
     const initial = (b.name || '').charAt(0);
     return `
       <div class="kpi-dash-card">
@@ -2826,16 +2893,13 @@ function renderKPIs() {
         <div class="kpi-dash-goal ${goalText?'':'empty'}" data-action="edit-brand-goal" data-id="${b.id}" title="${goalText?'클릭하면 수정':'클릭하면 작성'}">${goalText ? esc(goalText) : '목표를 입력하세요 (클릭)'}</div>
         ${isFiltered ? '' : `
           <div class="kpi-dash-btns">
-            <button class="kpi-dash-btn primary" data-action="kpi-card-toggle" data-id="${b.id}" style="background:${b.color};border-color:${b.color}">${collapsed ? '▽ KPI 펼치기' : '△ KPI 닫기'}</button>
             <button class="kpi-dash-btn outline" data-action="kpi-card-detail" data-id="${b.id}" style="color:${b.color};border-color:${b.color}">📊 상세 보기</button>
           </div>
         `}
-        ${collapsed ? '' : `
-          <div class="kpi-dash-kpis">
-            ${hasKpis ? bKpis.map(kpiItemHtml).join('') : '<div class="kpi-dash-empty-kpis">아직 KPI가 없어요</div>'}
-            <button class="kpi-dash-add" data-action="new-kpi-for-brand" data-id="${b.id}">+ KPI 추가</button>
-          </div>
-        `}
+        <div class="kpi-dash-kpis">
+          ${hasKpis ? bKpis.map(k => kpiItemHtml(k)).join('') : '<div class="kpi-dash-empty-kpis">아직 KPI가 없어요</div>'}
+          <button class="kpi-dash-add" data-action="new-kpi-for-brand" data-id="${b.id}">+ KPI 추가</button>
+        </div>
       </div>
     `;
   }
@@ -2850,8 +2914,6 @@ function renderKPIs() {
   if ((f === 'all' || f === '__none__') && noKpiKpis.length > 0) {
     const avg = Math.round(noKpiKpis.reduce((s,k) => s + kpiProgress(k).pct, 0) / noKpiKpis.length);
     const pctCls = avg >= 80 ? 'hi' : avg >= 40 ? 'mid' : 'lo';
-    const barColor = avg >= 80 ? 'var(--success)' : avg >= 40 ? 'var(--primary)' : 'var(--danger)';
-    const collapsed = isFiltered ? false : !!session.kpiCollapsed['__none__'];
     noBrandHtml = `
       <div class="kpi-dash-card">
         <div class="kpi-dash-top">
@@ -2865,15 +2927,12 @@ function renderKPIs() {
         <div class="kpi-dash-goal empty">—</div>
         ${isFiltered ? '' : `
           <div class="kpi-dash-btns">
-            <button class="kpi-dash-btn primary" data-action="kpi-card-toggle" data-id="__none__" style="background:#9c9a92;border-color:#9c9a92">${collapsed ? '▽ KPI 펼치기' : '△ KPI 닫기'}</button>
             <button class="kpi-dash-btn outline" data-action="kpi-filter" data-brand="__none__" style="color:#9c9a92;border-color:#9c9a92">📊 상세 보기</button>
           </div>
         `}
-        ${collapsed ? '' : `
-          <div class="kpi-dash-kpis">
-            ${noKpiKpis.map(kpiItemHtml).join('')}
-          </div>
-        `}
+        <div class="kpi-dash-kpis">
+          ${noKpiKpis.map(k => kpiItemHtml(k)).join('')}
+        </div>
       </div>
     `;
   }
@@ -2925,11 +2984,17 @@ function renderKPIs() {
     `;
   }
 
+  // Check if any KPI is currently expanded (to show "모두 접기" button)
+  const anyOpen = window._kpiOpen && window._kpiOpen.size > 0;
+
   return `
     ${renderTeamGoalCards()}
     ${renderKpiFilterBar(f)}
     ${hasAnything ? `
-      <div class="kpi-dash-section-label">📊 브랜드 KPI</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 14px">
+        <div class="kpi-dash-section-label" style="margin:0">📊 브랜드 KPI</div>
+        ${anyOpen ? `<button class="btn btn-secondary btn-sm" data-action="kpi-collapse-all">▲ 모두 접기</button>` : ''}
+      </div>
       <div class="kpi-dash-grid">
         ${brandCardsHtml}
         ${noBrandHtml}
@@ -3386,17 +3451,331 @@ async function actionTgSave(cardId) {
 }
 
 async function actionTgDeleteYear(cardId, year) {
-  if (!confirm(`${year}년 내역을 삭제할까요?`)) return;
-  const c = state.teamGoals.cards.find(x => x.id === cardId);
-  if (!c || !c.byYear) return;
-  delete c.byYear[year];
-  // Reset view year
-  const remaining = Object.keys(c.byYear).sort().reverse();
-  session.tgViewYear = session.tgViewYear || {};
-  session.tgViewYear[cardId] = remaining[0] || String(new Date().getFullYear());
-  closeModal();
-  await saveState();
+  showConfirm({
+    title: `${year}년 내역을 삭제할까요?`,
+    message: '이 작업은 되돌릴 수 없어요.',
+    confirmText: '삭제',
+    danger: true,
+    onConfirm: async () => {
+      const c = state.teamGoals.cards.find(x => x.id === cardId);
+      if (!c || !c.byYear) return;
+      delete c.byYear[year];
+      // Reset view year
+      const remaining = Object.keys(c.byYear).sort().reverse();
+      session.tgViewYear = session.tgViewYear || {};
+      session.tgViewYear[cardId] = remaining[0] || String(new Date().getFullYear());
+      closeModal();
+      await saveState();
+      render();
+    },
+  });
+}
+
+// ====== BACKUP / RESTORE ======
+const BACKUP_VERSION = 1;
+const LAST_BACKUP_KEY = 'bm-last-backup';
+
+function renderBackup() {
+  // Compute counts for preview
+  const counts = {
+    tasks: state.tasks.length,
+    projects: state.projects.length,
+    kpis: state.kpis.length,
+    meetings: state.meetings.length,
+    requests: state.requests.length,
+    members: state.members.length,
+    brands: state.brands.length,
+    templates: (state.taskTemplates || []).length,
+    trash: (state.trash || []).length,
+  };
+  const totalItems = Object.values(counts).reduce((a, b) => a + b, 0);
+
+  // Last backup time (from localStorage, per-browser)
+  let lastBackup = null;
+  try {
+    const raw = localStorage.getItem(LAST_BACKUP_KEY);
+    if (raw) lastBackup = JSON.parse(raw);
+  } catch {}
+
+  function formatDate(iso) {
+    if (!iso) return '없음';
+    const d = new Date(iso);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    const h = String(d.getHours()).padStart(2,'0');
+    const min = String(d.getMinutes()).padStart(2,'0');
+    return `${y}.${m}.${day} ${h}:${min}`;
+  }
+
+  // Days since last backup → recommendation severity
+  let recommendCls = '';
+  let recommendText = '';
+  if (!lastBackup) {
+    recommendCls = 'warn';
+    recommendText = '아직 백업한 적이 없어요. 지금 한 번 받아두시는 걸 추천드려요.';
+  } else {
+    const days = Math.floor((Date.now() - new Date(lastBackup.at).getTime()) / (1000*60*60*24));
+    if (days >= 14) {
+      recommendCls = 'urgent';
+      recommendText = `마지막 백업 후 ${days}일이 지났어요. 새로 받아두세요.`;
+    } else if (days >= 7) {
+      recommendCls = 'warn';
+      recommendText = `마지막 백업 후 ${days}일 됐어요. 곧 새로 받아두면 좋아요.`;
+    } else {
+      recommendCls = 'ok';
+      recommendText = `최근에 백업하셨어요 (${days === 0 ? '오늘' : days + '일 전'}). 안전!`;
+    }
+  }
+
+  return `
+    <div class="backup-page">
+      <div class="backup-status ${recommendCls}">
+        <div class="backup-status-icon">${recommendCls === 'ok' ? '✓' : recommendCls === 'warn' ? '⚠' : '!'}</div>
+        <div class="backup-status-main">
+          <div class="backup-status-title">${recommendText}</div>
+          <div class="backup-status-sub">마지막 백업: ${formatDate(lastBackup?.at)}${lastBackup?.by ? ` · ${esc(lastBackup.by)}` : ''}</div>
+        </div>
+      </div>
+
+      <div class="backup-grid">
+        <!-- Download -->
+        <div class="backup-card">
+          <div class="backup-card-header">
+            <div class="backup-card-icon" style="background:var(--primary-soft);color:var(--primary)">📥</div>
+            <div>
+              <div class="backup-card-title">백업 다운로드</div>
+              <div class="backup-card-desc">전체 데이터를 한 파일로 저장해요</div>
+            </div>
+          </div>
+
+          <div class="backup-counts">
+            <div class="backup-count"><span class="bc-num">${counts.tasks}</span><span class="bc-lbl">업무</span></div>
+            <div class="backup-count"><span class="bc-num">${counts.projects}</span><span class="bc-lbl">프로젝트</span></div>
+            <div class="backup-count"><span class="bc-num">${counts.kpis}</span><span class="bc-lbl">KPI</span></div>
+            <div class="backup-count"><span class="bc-num">${counts.meetings}</span><span class="bc-lbl">회의록</span></div>
+            <div class="backup-count"><span class="bc-num">${counts.requests}</span><span class="bc-lbl">요청</span></div>
+            <div class="backup-count"><span class="bc-num">${counts.templates}</span><span class="bc-lbl">템플릿</span></div>
+            <div class="backup-count"><span class="bc-num">${counts.brands}</span><span class="bc-lbl">브랜드</span></div>
+            <div class="backup-count"><span class="bc-num">${counts.members}</span><span class="bc-lbl">팀원</span></div>
+          </div>
+
+          <button class="btn btn-primary backup-action-btn" data-action="backup-download">
+            📥 백업 파일 다운로드 (${totalItems}개 항목)
+          </button>
+          <div class="backup-card-hint">
+            💡 다운로드한 파일은 안전한 곳에 보관하세요.<br>
+            (구글 드라이브, 이메일, USB 등)
+          </div>
+        </div>
+
+        <!-- Restore -->
+        <div class="backup-card">
+          <div class="backup-card-header">
+            <div class="backup-card-icon" style="background:var(--warning-soft);color:var(--warning)">📤</div>
+            <div>
+              <div class="backup-card-title">백업에서 복원</div>
+              <div class="backup-card-desc">이전에 받은 백업 파일로 되돌려요</div>
+            </div>
+          </div>
+
+          <div class="backup-dropzone" id="backup-dropzone">
+            <div class="bd-icon">📁</div>
+            <div class="bd-title">파일을 여기로 드래그</div>
+            <div class="bd-or">또는</div>
+            <label class="btn btn-secondary" style="margin:0;cursor:pointer">
+              파일 선택
+              <input type="file" accept=".json" style="display:none" id="backup-file-input" onchange="window.handleBackupFileSelect(this)">
+            </label>
+          </div>
+
+          <div class="backup-card-hint" style="color:var(--danger)">
+            ⚠️ 복원하면 <strong>현재 모든 데이터가 백업 시점으로 덮어써져요</strong>.<br>
+            먼저 현재 상태를 백업해두는 걸 권장해요.
+          </div>
+        </div>
+      </div>
+
+      <div class="backup-tips">
+        <div class="backup-tips-title">💡 백업 활용 팁</div>
+        <ul>
+          <li><strong>주 1회</strong> 정도 정기적으로 백업해두면 안전해요</li>
+          <li>큰 변경 작업 전(브랜드 정리, 일괄 삭제 등)에는 꼭 백업 먼저!</li>
+          <li>백업 파일은 <strong>JSON 형식</strong>으로 텍스트 에디터로도 열어볼 수 있어요</li>
+          <li>다른 팀원도 이 페이지에서 백업/복원 가능해요</li>
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
+// Build backup object from current state
+function buildBackup() {
+  return {
+    version: BACKUP_VERSION,
+    exportedAt: now(),
+    exportedBy: me()?.name || 'unknown',
+    teamName: state.setup?.teamName || '',
+    state: JSON.parse(JSON.stringify(state)),
+  };
+}
+
+async function actionBackupDownload() {
+  const backup = buildBackup();
+  const json = JSON.stringify(backup, null, 2);
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+
+  const d = new Date();
+  const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
+  const teamName = (state.setup?.teamName || '워크스페이스').replace(/[^\w가-힣]/g, '_');
+  const filename = `${teamName}_백업_${dateStr}.json`;
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  // Record last backup time (per-browser)
+  try {
+    localStorage.setItem(LAST_BACKUP_KEY, JSON.stringify({
+      at: now(),
+      by: me()?.name,
+      filename,
+    }));
+  } catch {}
+
+  logAct('백업 파일 다운로드');
   render();
+}
+
+window.handleBackupFileSelect = function(input) {
+  const file = input.files?.[0];
+  input.value = ''; // Allow re-selecting same file
+  if (!file) return;
+  handleBackupFile(file);
+};
+
+function handleBackupFile(file) {
+  if (!file.name.endsWith('.json')) {
+    alert('JSON 파일만 복원할 수 있어요.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.version || !data.state) {
+        alert('올바른 백업 파일이 아니에요.');
+        return;
+      }
+      previewBackupRestore(data, file.name);
+    } catch (err) {
+      alert('파일을 읽지 못했어요. 손상된 파일일 수 있어요.');
+      console.warn('Backup parse error:', err);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function previewBackupRestore(backup, filename) {
+  const s = backup.state || {};
+  const counts = {
+    tasks: (s.tasks || []).length,
+    projects: (s.projects || []).length,
+    kpis: (s.kpis || []).length,
+    meetings: (s.meetings || []).length,
+    requests: (s.requests || []).length,
+    members: (s.members || []).length,
+    brands: (s.brands || []).length,
+    templates: (s.taskTemplates || []).length,
+  };
+  const exportDate = backup.exportedAt ? new Date(backup.exportedAt).toLocaleString('ko-KR') : '알 수 없음';
+  const teamName = backup.teamName || s.setup?.teamName || '(이름 없음)';
+
+  const previewHtml = `
+    <div style="background:var(--surface-soft);padding:14px;border-radius:8px;margin:14px 0;font-size:13px">
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 14px">
+        <div style="color:var(--text-muted)">파일</div>
+        <div style="font-weight:600;word-break:break-all">${esc(filename)}</div>
+        <div style="color:var(--text-muted)">팀</div>
+        <div style="font-weight:600">${esc(teamName)}</div>
+        <div style="color:var(--text-muted)">백업 일시</div>
+        <div style="font-weight:600">${esc(exportDate)}</div>
+        <div style="color:var(--text-muted)">작성자</div>
+        <div style="font-weight:600">${esc(backup.exportedBy || '알 수 없음')}</div>
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center">
+        <div><div style="font-weight:800;color:var(--primary)">${counts.tasks}</div><div style="font-size:11px;color:var(--text-muted)">업무</div></div>
+        <div><div style="font-weight:800;color:var(--primary)">${counts.projects}</div><div style="font-size:11px;color:var(--text-muted)">프로젝트</div></div>
+        <div><div style="font-weight:800;color:var(--primary)">${counts.kpis}</div><div style="font-size:11px;color:var(--text-muted)">KPI</div></div>
+        <div><div style="font-weight:800;color:var(--primary)">${counts.meetings}</div><div style="font-size:11px;color:var(--text-muted)">회의록</div></div>
+        <div><div style="font-weight:800;color:var(--primary)">${counts.requests}</div><div style="font-size:11px;color:var(--text-muted)">요청</div></div>
+        <div><div style="font-weight:800;color:var(--primary)">${counts.templates}</div><div style="font-size:11px;color:var(--text-muted)">템플릿</div></div>
+        <div><div style="font-weight:800;color:var(--primary)">${counts.brands}</div><div style="font-size:11px;color:var(--text-muted)">브랜드</div></div>
+        <div><div style="font-weight:800;color:var(--primary)">${counts.members}</div><div style="font-size:11px;color:var(--text-muted)">팀원</div></div>
+      </div>
+    </div>
+  `;
+
+  showConfirm({
+    title: '이 백업으로 복원할까요?',
+    message: `${previewHtml}<strong style="color:var(--danger)">⚠️ 현재 모든 데이터가 위 백업 시점으로 덮어써져요. 되돌릴 수 없어요.</strong>`,
+    confirmText: '복원하기',
+    cancelText: '취소',
+    danger: true,
+    onConfirm: () => actionBackupRestore(backup),
+  });
+}
+
+async function actionBackupRestore(backup) {
+  try {
+    // Replace state entirely
+    state = backup.state;
+    // Make sure all required fields exist (in case old backup is missing new fields)
+    if (!Array.isArray(state.tasks)) state.tasks = [];
+    if (!Array.isArray(state.projects)) state.projects = [];
+    if (!Array.isArray(state.kpis)) state.kpis = [];
+    if (!Array.isArray(state.meetings)) state.meetings = [];
+    if (!Array.isArray(state.requests)) state.requests = [];
+    if (!Array.isArray(state.members)) state.members = [];
+    if (!Array.isArray(state.brands)) state.brands = [];
+    if (!Array.isArray(state.taskTemplates)) state.taskTemplates = [];
+    if (!Array.isArray(state.trash)) state.trash = [];
+    if (!Array.isArray(state.log)) state.log = [];
+    if (!state.setup) state.setup = { completed: true, teamName: '' };
+    if (!state.goals) state.goals = {};
+
+    logAct(`백업에서 복원: ${backup.exportedAt ? new Date(backup.exportedAt).toLocaleDateString('ko-KR') : '알 수 없음'}`);
+    await saveState();
+    alert('✅ 복원이 완료됐어요!');
+    render();
+  } catch (e) {
+    console.error('Restore failed', e);
+    alert('복원 중 오류가 발생했어요. 콘솔을 확인해주세요.');
+  }
+}
+
+// Wire up drag&drop on backup dropzone after page renders
+function attachBackupDropzone() {
+  const dz = document.getElementById('backup-dropzone');
+  if (!dz) return;
+  dz.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dz.classList.add('dragover');
+  });
+  dz.addEventListener('dragleave', (e) => {
+    if (e.target === dz) dz.classList.remove('dragover');
+  });
+  dz.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dz.classList.remove('dragover');
+    const file = e.dataTransfer?.files?.[0];
+    if (file) handleBackupFile(file);
+  });
 }
 
 // ====== TRASH ======
@@ -4038,10 +4417,19 @@ async function actionSaveMeeting(id) {
   closeModal(); await saveState(); render();
 }
 async function actionDeleteMeeting(id) {
-  if (!confirm('회의록을 삭제할까요?')) return;
-  state.meetings = state.meetings.filter(m => m.id !== id);
-  if (session.selectedMeetingId === id) session.selectedMeetingId = null;
-  closeModal(); await saveState(); render();
+  const m = state.meetings.find(x => x.id === id);
+  if (!m) return;
+  showConfirm({
+    title: '회의록을 삭제할까요?',
+    message: `"${esc(m.title || '제목 없음')}"<br>이 작업은 되돌릴 수 없어요.`,
+    confirmText: '삭제',
+    danger: true,
+    onConfirm: async () => {
+      state.meetings = state.meetings.filter(m => m.id !== id);
+      if (session.selectedMeetingId === id) session.selectedMeetingId = null;
+      closeModal(); await saveState(); render();
+    },
+  });
 }
 async function actionAddActionItem(meetingId) {
   const m = state.meetings.find(x => x.id === meetingId);
@@ -4098,9 +4486,16 @@ async function actionSaveRequest(id) {
   closeModal(); await saveState(); render();
 }
 async function actionDeleteRequest(id) {
-  if (!confirm('요청을 삭제할까요?')) return;
-  state.requests = state.requests.filter(r => r.id !== id);
-  closeModal(); await saveState(); render();
+  showConfirm({
+    title: '요청을 삭제할까요?',
+    message: '이 작업은 되돌릴 수 없어요.',
+    confirmText: '삭제',
+    danger: true,
+    onConfirm: async () => {
+      state.requests = state.requests.filter(r => r.id !== id);
+      closeModal(); await saveState(); render();
+    },
+  });
 }
 async function actionCompleteRequestQuick(id) {
   const r = state.requests.find(x => x.id === id);
@@ -4142,11 +4537,20 @@ async function actionSaveKPI(id) {
   closeModal(); await saveState(); render();
 }
 async function actionDeleteKPI(id) {
-  if (!confirm('KPI를 삭제할까요?')) return;
-  state.kpis = state.kpis.filter(k => k.id !== id);
-  state.tasks.forEach(t => { if (t.kpiId === id) t.kpiId = null; });
-  state.projects.forEach(p => { if (p.kpiId === id) p.kpiId = null; });
-  closeModal(); await saveState(); render();
+  const k = state.kpis.find(x => x.id === id);
+  if (!k) return;
+  showConfirm({
+    title: 'KPI를 삭제할까요?',
+    message: `"${esc(k.title)}"<br>연결된 업무·프로젝트의 KPI 정보가 해제됩니다.<br>이 작업은 되돌릴 수 없어요.`,
+    confirmText: '삭제',
+    danger: true,
+    onConfirm: async () => {
+      state.kpis = state.kpis.filter(k => k.id !== id);
+      state.tasks.forEach(t => { if (t.kpiId === id) t.kpiId = null; });
+      state.projects.forEach(p => { if (p.kpiId === id) p.kpiId = null; });
+      closeModal(); await saveState(); render();
+    },
+  });
 }
 
 async function actionSaveMember(id) {
@@ -4391,10 +4795,19 @@ async function actionTplSave(id) {
 }
 
 async function actionTplDelete(id) {
-  if (!confirm('이 템플릿을 삭제할까요?')) return;
-  state.taskTemplates = state.taskTemplates.filter(t => t.id !== id);
-  delete session.tplEditBuffer;
-  closeModal(); await saveState(); render();
+  const t = state.taskTemplates.find(x => x.id === id);
+  if (!t) return;
+  showConfirm({
+    title: '템플릿을 삭제할까요?',
+    message: `"${esc(t.name)}"<br>이 작업은 되돌릴 수 없어요.`,
+    confirmText: '삭제',
+    danger: true,
+    onConfirm: async () => {
+      state.taskTemplates = state.taskTemplates.filter(t => t.id !== id);
+      delete session.tplEditBuffer;
+      closeModal(); await saveState(); render();
+    },
+  });
 }
 
 function actionTplFilter(id) {
@@ -4511,13 +4924,20 @@ async function actionSaveBrand(id) {
 async function actionDeleteBrand(id) {
   const b = state.brands.find(x => x.id === id);
   if (!b) return;
-  if (!confirm(`"${b.name}" 브랜드를 삭제할까요? 연결된 업무·프로젝트·KPI·요청의 브랜드 정보가 해제됩니다.`)) return;
-  state.brands = state.brands.filter(x => x.id !== id);
-  state.tasks.forEach(t => { if (t.brandId === id) t.brandId = null; });
-  state.projects.forEach(p => { if (p.brandId === id) p.brandId = null; });
-  state.kpis.forEach(k => { if (k.brandId === id) k.brandId = null; });
-  state.requests.forEach(r => { if (r.brandId === id) r.brandId = null; });
-  await saveState(); render();
+  showConfirm({
+    title: '브랜드를 삭제할까요?',
+    message: `"${esc(b.name)}"<br>연결된 업무·프로젝트·KPI·요청의 브랜드 정보가 해제됩니다.<br>이 작업은 되돌릴 수 없어요.`,
+    confirmText: '삭제',
+    danger: true,
+    onConfirm: async () => {
+      state.brands = state.brands.filter(x => x.id !== id);
+      state.tasks.forEach(t => { if (t.brandId === id) t.brandId = null; });
+      state.projects.forEach(p => { if (p.brandId === id) p.brandId = null; });
+      state.kpis.forEach(k => { if (k.brandId === id) k.brandId = null; });
+      state.requests.forEach(r => { if (r.brandId === id) r.brandId = null; });
+      await saveState(); render();
+    },
+  });
 }
 async function actionFilterByBrand(id) {
   session.view = 'projects';
@@ -4626,16 +5046,24 @@ async function actionPjFilter(brandId) {
 }
 async function actionKpiFilter(brandId) {
   session.kpiBrandFilter = brandId;
+  // Reset transient accordion state when switching filter view
+  window._kpiOpen = null;
   render();
 }
 async function actionCompleteProject(id) {
   const p = state.projects.find(x => x.id === id);
   if (!p) return;
-  if (!confirm(`"${p.name}" 프로젝트를 완료로 표시할까요?\n완료됨 탭에서 다시 볼 수 있어요.`)) return;
-  p.status = 'done';
-  logAct(`프로젝트 완료: ${p.name}`);
-  session.selectedProjectId = null;
-  await saveState(); render();
+  showConfirm({
+    title: '프로젝트를 완료로 표시할까요?',
+    message: `"${esc(p.name)}"<br>완료됨 탭에서 다시 볼 수 있어요.`,
+    confirmText: '완료',
+    onConfirm: async () => {
+      p.status = 'done';
+      logAct(`프로젝트 완료: ${p.name}`);
+      session.selectedProjectId = null;
+      await saveState(); render();
+    },
+  });
 }
 async function actionReopenProject(id) {
   const p = state.projects.find(x => x.id === id);
@@ -4712,10 +5140,17 @@ async function actionAddComment(projectId) {
   await saveState(); render();
 }
 async function actionDeleteComment(projectId, commentId) {
-  if (!confirm('이 댓글을 삭제할까요?')) return;
-  const p = state.projects.find(x => x.id === projectId);
-  p.comments = (p.comments || []).filter(c => c.id !== commentId);
-  await saveState(); render();
+  showConfirm({
+    title: '댓글을 삭제할까요?',
+    message: '이 작업은 되돌릴 수 없어요.',
+    confirmText: '삭제',
+    danger: true,
+    onConfirm: async () => {
+      const p = state.projects.find(x => x.id === projectId);
+      p.comments = (p.comments || []).filter(c => c.id !== commentId);
+      await saveState(); render();
+    },
+  });
 }
 async function actionQuickAddMeeting(projectId, title) {
   if (!title.trim()) return;
@@ -4792,7 +5227,19 @@ document.addEventListener('click', async (e) => {
     case 'logout': return actionLogout();
     case 'reset-setup': return actionResetSetup();
     case 'reset-all': return actionResetAll();
-    case 'nav': session.view = target.dataset.view; return render();
+    case 'nav': {
+      const newView = target.dataset.view;
+      // Reset transient KPI accordion state when leaving the KPI page
+      if (session.view === 'kpis' && newView !== 'kpis') {
+        window._kpiOpen = null;
+      }
+      // Also reset when ENTERING KPI page (so navigating to KPI = all collapsed)
+      if (newView === 'kpis') {
+        window._kpiOpen = null;
+      }
+      session.view = newView;
+      return render();
+    }
     case 'close-modal': return closeModal();
 
     case 'new-task': return openTaskModal();
@@ -4890,11 +5337,6 @@ document.addEventListener('click', async (e) => {
     case 'edit-brand-goal': return openBrandGoalModal(id);
     case 'save-brand-goal': return actionSaveBrandGoal(id);
 
-    case 'kpi-card-toggle': {
-      session.kpiCollapsed = session.kpiCollapsed || {};
-      session.kpiCollapsed[id] = !session.kpiCollapsed[id];
-      return render();
-    }
     case 'kpi-item-toggle': {
       // Use transient (in-memory) state — always starts collapsed on page load
       window._kpiOpen = window._kpiOpen || new Set();
@@ -4902,8 +5344,13 @@ document.addEventListener('click', async (e) => {
       else window._kpiOpen.add(id);
       return render();
     }
+    case 'kpi-collapse-all': {
+      window._kpiOpen = null;
+      return render();
+    }
     case 'kpi-card-detail': {
       session.kpiBrandFilter = id;
+      window._kpiOpen = null;
       return render();
     }
     case 'new-kpi-for-brand': {
@@ -4924,6 +5371,8 @@ document.addEventListener('click', async (e) => {
     case 'trash-purge': return actionTrashPurge(id);
     case 'trash-empty-all': return actionTrashEmptyAll();
     case 'trash-filter': return actionTrashFilter(id);
+
+    case 'backup-download': return actionBackupDownload();
 
     case 'save-member': return actionSaveMember(id);
     case 'save-team-name': return actionSaveTeamName();
