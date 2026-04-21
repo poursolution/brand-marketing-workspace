@@ -131,15 +131,21 @@
   .layout { display: flex; min-height: 100vh; }
   .sidebar {
     width: 220px; background: var(--bg-2); border-right: 1px solid var(--border);
-    padding: 20px 12px; flex-shrink: 0; display: flex; flex-direction: column;
+    padding: 20px 12px; flex-shrink: 0;
+    /* Stick to viewport so user chip is always visible */
+    position: sticky; top: 0; height: 100vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
   }
   .sidebar .brand {
     padding: 4px 12px 20px; border-bottom: 1px solid var(--border);
-    margin-bottom: 16px;
+    margin-bottom: 16px; flex-shrink: 0;
   }
   .sidebar .brand-name { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
   .sidebar .brand-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-  .sidebar nav { flex: 1; }
+  .sidebar nav { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+  .sidebar nav::-webkit-scrollbar { width: 4px; }
+  .sidebar nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
   .nav-item {
     display: flex; align-items: center; gap: 10px; padding: 8px 12px;
     border-radius: var(--radius); font-size: 13px; color: var(--text-muted);
@@ -149,16 +155,17 @@
   .nav-item.active { background: var(--surface); color: var(--primary); font-weight: 600; box-shadow: var(--shadow-sm); }
   .nav-item .icon { font-size: 15px; width: 18px; text-align: center; }
   .nav-section-title { font-size: 10px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.08em; padding: 14px 12px 6px; }
-  .sidebar-footer { border-top: 1px solid var(--border); padding-top: 12px; }
+  .sidebar-footer { border-top: 1px solid var(--border); padding-top: 12px; flex-shrink: 0; }
   .user-chip {
     display: flex; align-items: center; gap: 10px; padding: 8px 10px;
     border-radius: var(--radius); cursor: pointer; transition: all 0.15s;
+    min-width: 0;
   }
   .user-chip:hover { background: rgba(0,0,0,0.04); }
   .user-chip .avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px; flex-shrink: 0; }
-  .user-chip .uinfo { min-width: 0; flex: 1; }
+  .user-chip .uinfo { min-width: 0; flex: 1; overflow: hidden; }
   .user-chip .uname { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .user-chip .urole { font-size: 11px; color: var(--text-muted); }
+  .user-chip .urole { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   .main { flex: 1; min-width: 0; overflow-x: hidden; }
   .topbar {
@@ -329,9 +336,9 @@
   /* === Mobile === */
   @media (max-width: 760px) {
     .layout { flex-direction: column; }
-    .sidebar { width: 100%; flex-direction: row; padding: 12px; gap: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    .sidebar { width: 100%; height: auto; position: static; flex-direction: row; padding: 12px; gap: 8px; overflow-x: auto; overflow-y: visible; border-right: none; border-bottom: 1px solid var(--border); }
     .sidebar .brand { display: none; }
-    .sidebar nav { display: flex; gap: 4px; flex: 1; }
+    .sidebar nav { display: flex; gap: 4px; flex: 1; overflow-y: visible; overflow-x: auto; }
     .nav-section-title { display: none; }
     .nav-item { white-space: nowrap; padding: 8px 10px; }
     .nav-item .label { display: none; }
@@ -710,6 +717,9 @@
   .pj-filter-divider { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
   .pj-filter-done { background: var(--bg-2); }
   .pj-filter-done.active { background: var(--success); color: white; border-color: var(--success); }
+  .pj-filter-mine { background: var(--primary-soft); color: var(--primary); border-color: var(--primary-soft); }
+  .pj-filter-mine:hover { border-color: var(--primary); color: var(--primary); }
+  .pj-filter-mine.active { background: var(--primary); color: white; border-color: var(--primary); }
 
   .pj-page { display: grid; grid-template-columns: 300px 1fr; gap: 18px; align-items: start; }
   @media (max-width: 900px) { .pj-page { grid-template-columns: 1fr; } }
@@ -800,6 +810,37 @@
   .pj-note-side .ndel:hover { background: var(--danger-soft); }
   .pj-note-content { font-size: 13px; line-height: 1.65; white-space: pre-wrap; }
 
+  /* Confirm Dialog */
+  .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .confirm-dialog { background: var(--surface); border-radius: 12px; padding: 24px; max-width: 420px; width: 100%; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+  .confirm-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .confirm-msg { font-size: 13.5px; color: var(--text-muted); line-height: 1.55; margin-bottom: 20px; }
+  .confirm-buttons { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* Trash page */
+  .trash-page { }
+  .trash-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+  .trash-info { font-size: 13px; color: var(--text-muted); }
+  .trash-filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .trash-filter-chip { padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+  .trash-filter-chip:hover { border-color: var(--border-strong); }
+  .trash-filter-chip.active { background: var(--text); color: white; border-color: var(--text); }
+  .trash-list { display: flex; flex-direction: column; gap: 8px; }
+  .trash-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .trash-item-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--surface-soft); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .trash-item-main { flex: 1; min-width: 0; }
+  .trash-item-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .trash-item-meta { font-size: 11.5px; color: var(--text-muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .trash-item-kind { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: var(--surface-soft); color: var(--text-muted); }
+  .trash-item-days { font-weight: 600; }
+  .trash-item-days.urgent { color: var(--danger); }
+  .trash-item-days.soon { color: var(--warning); }
+  .trash-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .trash-empty { padding: 60px 20px; text-align: center; color: var(--text-muted); background: var(--surface); border: 1px dashed var(--border); border-radius: 12px; }
+  .trash-empty .ei { font-size: 44px; margin-bottom: 14px; opacity: 0.4; }
+  .trash-empty .eih { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+
   /* Note images */
   .pj-note-images { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .pj-note-img { max-width: 200px; max-height: 200px; border-radius: 6px; cursor: zoom-in; border: 1px solid var(--border); object-fit: cover; transition: transform 0.12s; }
@@ -853,6 +894,23 @@
   .kpi-dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: stretch; }
   @media (max-width: 1100px) { .kpi-dash-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 700px) { .kpi-dash-grid { grid-template-columns: 1fr; } }
+
+  /* === KPI Detail Mode (single-brand filter) === */
+  .kpi-detail-brand-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; box-shadow: var(--shadow-sm); }
+  .kpi-detail-section-label { font-size: 13px; font-weight: 700; color: var(--text); margin: 4px 0 14px; letter-spacing: -0.01em; }
+  .kpi-detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: start; }
+  @media (max-width: 1100px) { .kpi-detail-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px) { .kpi-detail-grid { grid-template-columns: 1fr; } }
+  .kpi-detail-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow-sm); }
+  .kpi-detail-card .kpi-dash-kitem { padding: 0; border: none; cursor: default; }
+  .kpi-detail-card .kpi-dash-kitem:hover { background: transparent; }
+  .kpi-detail-card .kpi-dash-accordion { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .kpi-detail-add { background: transparent; border: 2px dashed var(--border); border-radius: 12px; padding: 14px 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 120px; color: var(--text-muted); font-size: 13px; font-weight: 600; transition: all 0.15s; }
+  .kpi-detail-add:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+  .kpi-detail-add .add-icon { font-size: 22px; line-height: 1; }
+  .kpi-detail-empty { padding: 60px 20px; text-align: center; color: var(--text-muted); background: var(--surface); border: 1px dashed var(--border); border-radius: 12px; }
+  .kpi-detail-empty .ei { font-size: 44px; margin-bottom: 14px; opacity: 0.4; }
+  .kpi-detail-empty .eih { font-size: 15px; font-weight: 600; color: var(--text); }
 
   .kpi-dash-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 10px; transition: all 0.15s; position: relative; }
   .kpi-dash-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-color: var(--border-strong); }
@@ -925,6 +983,18 @@
   .kpi-dash-acc-task-status { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 3px; background: var(--surface-soft); color: var(--text-muted); flex-shrink: 0; }
 
   .kpi-dash-acc-empty { font-size: 12px; color: var(--text-muted); padding: 6px; font-style: italic; }
+
+  /* Project-grouped task layout (in detail mode) */
+  .kpi-dash-proj-block { margin-bottom: 12px; padding: 10px 10px 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  .kpi-dash-proj-block:last-child { margin-bottom: 2px; }
+  .kpi-dash-proj-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4px 4px 8px; cursor: pointer; border-bottom: 1px dashed var(--border); margin-bottom: 8px; transition: color 0.12s; }
+  .kpi-dash-proj-head:hover .kpi-dash-proj-name { color: var(--primary); }
+  .kpi-dash-proj-name { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kpi-dash-proj-prog { font-size: 11px; color: var(--text-muted); flex-shrink: 0; font-weight: 600; }
+  .kpi-dash-proj-tasks { display: flex; flex-direction: column; gap: 0; }
+  .kpi-dash-proj-tasks .kpi-dash-acc-task { background: var(--surface-soft); border: none; padding: 6px 8px; margin-bottom: 3px; }
+  .kpi-dash-proj-tasks .kpi-dash-acc-task:last-child { margin-bottom: 0; }
+  .kpi-dash-proj-empty { padding: 4px 8px; font-size: 11.5px; }
 
   .kpi-dash-add { padding: 8px; border: 1px dashed var(--border); color: var(--text-muted); font-size: 11.5px; background: transparent; border-radius: 7px; font-weight: 600; cursor: pointer; transition: all 0.12s; margin-top: 4px; }
   .kpi-dash-add:hover { color: var(--primary); border-color: var(--primary); background: rgba(99,102,241,0.04); }
@@ -1010,6 +1080,7 @@ const initialState = () => ({
   taskTemplates: [],
   dailyNotes: {},
   pinnedMemo: '',
+  trash: [],
   log: [],
 });
 
@@ -1121,6 +1192,11 @@ async function loadState() {
   // Ensure every brand has a goal field
   state.brands.forEach(b => { if (typeof b.goal !== 'string') b.goal = ''; });
   if (!Array.isArray(state.taskTemplates)) state.taskTemplates = [];
+  if (!Array.isArray(state.trash)) state.trash = [];
+  // Auto-purge trash items older than 7 days
+  const TRASH_DAYS = 7;
+  const cutoff = Date.now() - TRASH_DAYS * 24 * 60 * 60 * 1000;
+  state.trash = state.trash.filter(item => new Date(item.deletedAt).getTime() > cutoff);
   // Migrate template brandId (single) → brandIds (array)
   state.taskTemplates.forEach(t => {
     if (!Array.isArray(t.brandIds)) {
@@ -1226,6 +1302,51 @@ const PROJ_STATUS = { active: { label: '진행중', cls: 'badge-blue' }, paused:
 function logAct(text) {
   state.log.unshift({ id: uid(), at: now(), by: session.currentUserId, text });
   state.log = state.log.slice(0, 200);
+}
+
+// ====== CONFIRM DIALOG (nicer than browser confirm) ======
+function showConfirm({ title, message, confirmText = '확인', cancelText = '취소', danger = false, onConfirm }) {
+  document.querySelector('.confirm-overlay')?.remove();
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-dialog">
+      <div class="confirm-title">${esc(title)}</div>
+      ${message ? `<div class="confirm-msg">${message}</div>` : ''}
+      <div class="confirm-buttons">
+        <button class="btn btn-secondary confirm-cancel">${esc(cancelText)}</button>
+        <button class="btn ${danger ? 'btn-danger' : 'btn-primary'} confirm-ok">${esc(confirmText)}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  overlay.querySelector('.confirm-cancel').onclick = close;
+  overlay.querySelector('.confirm-ok').onclick = () => { close(); onConfirm?.(); };
+  overlay.onclick = (e) => { if (e.target === overlay) close(); };
+  const escHandler = (e) => { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escHandler); } };
+  document.addEventListener('keydown', escHandler);
+  // Focus the confirm button
+  setTimeout(() => overlay.querySelector('.confirm-ok').focus(), 50);
+}
+
+// ====== TRASH HELPERS ======
+const TRASH_KIND_LABEL = { task: '업무', project: '프로젝트', note: '노트' };
+function moveToTrash(kind, data, extra = {}) {
+  state.trash.unshift({
+    id: uid(),
+    kind,
+    data,           // full original object
+    extra,          // contextual info (e.g. projectId for notes)
+    deletedAt: now(),
+    deletedBy: session.currentUserId,
+  });
+  // Keep at most 200 items in trash
+  if (state.trash.length > 200) state.trash = state.trash.slice(0, 200);
+}
+function trashDaysLeft(item) {
+  const elapsed = (Date.now() - new Date(item.deletedAt).getTime()) / (1000 * 60 * 60 * 24);
+  return Math.max(0, Math.ceil(7 - elapsed));
 }
 
 async function rolloverTasks() {
@@ -1609,6 +1730,7 @@ function renderSidebar() {
         { id: 'meetings', icon: '☷', label: '회의록' },
         { id: 'templates', icon: '📋', label: '업무 템플릿' },
         { id: 'team', icon: '○', label: '팀원' },
+        { id: 'trash', icon: '🗑', label: '휴지통' },
       ]
     },
   ];
@@ -1639,7 +1761,7 @@ function renderSidebar() {
 }
 
 function renderTopbar() {
-  const titles = { dashboard: '대시보드', tasks: '업무', projects: '프로젝트', meetings: '회의록', requests: '타팀 요청', kpis: 'KPI / 목표', goals: '내 연간 목표', templates: '업무 템플릿', team: '팀원' };
+  const titles = { dashboard: '대시보드', tasks: '업무', projects: '프로젝트', meetings: '회의록', requests: '타팀 요청', kpis: 'KPI / 목표', goals: '내 연간 목표', templates: '업무 템플릿', team: '팀원', trash: '휴지통' };
   const actions = {
     projects: '<button class="btn btn-primary" data-action="new-project">+ 새 프로젝트</button>',
     meetings: '<button class="btn btn-primary" data-action="new-meeting">+ 새 회의록</button>',
@@ -1666,6 +1788,7 @@ function renderView() {
     case 'goals': return renderGoals();
     case 'templates': return renderTemplates();
     case 'team': return renderTeam();
+    case 'trash': return renderTrash();
     default: return '';
   }
 }
@@ -1674,7 +1797,10 @@ function renderView() {
 function renderDashboard() {
   const u = me();
   const myTasks = state.tasks.filter(t => t.assigneeId === u.id && t.status !== 'done');
+  // "My active projects" = active projects where I have at least one task assigned
+  const myProjectIds = new Set(state.tasks.filter(t => t.assigneeId === u.id).map(t => t.projectId).filter(Boolean));
   const activeProjects = state.projects.filter(p => p.status === 'active');
+  const myActiveProjects = activeProjects.filter(p => myProjectIds.has(p.id));
   const pendingRequests = state.requests.filter(r => r.status === 'received' || r.status === 'doing');
   const avgKpi = state.kpis.length ? Math.round(state.kpis.reduce((s, k) => s + kpiProgress(k).pct, 0) / state.kpis.length) : 0;
 
@@ -1697,9 +1823,9 @@ function renderDashboard() {
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background:var(--info-soft);color:var(--info)">◇</div>
-        <div class="stat-label">진행 중 프로젝트</div>
-        <div class="stat-value">${activeProjects.length}<span style="font-size:14px;color:var(--text-muted);font-weight:500">개</span></div>
-        <div class="stat-sub">전체 ${state.projects.length}개</div>
+        <div class="stat-label">내 진행 프로젝트</div>
+        <div class="stat-value">${myActiveProjects.length}<span style="font-size:14px;color:var(--text-muted);font-weight:500">개</span></div>
+        <div class="stat-sub">팀 전체 ${activeProjects.length}개 중</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background:var(--warning-soft);color:var(--warning)">⇄</div>
@@ -1746,8 +1872,8 @@ function renderDashboard() {
         ${state.kpis.length ? `<div style="display:flex;flex-direction:column;gap:14px">${state.kpis.slice(0,4).map(kpiMiniRow).join('')}</div>` : `<div class="empty"><div class="ei">↗</div>등록된 KPI가 없어요</div>`}
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">◇ 진행 중 프로젝트</div><button class="btn btn-ghost btn-sm" data-action="nav" data-view="projects">전체 보기 →</button></div>
-        ${activeProjects.length ? `<div style="display:flex;flex-direction:column;gap:14px">${activeProjects.slice(0,3).map(projectMiniRow).join('')}</div>` : `<div class="empty"><div class="ei">◇</div>진행 중 프로젝트가 없어요</div>`}
+        <div class="card-header"><div class="card-title">◇ 내 진행 프로젝트</div><button class="btn btn-ghost btn-sm" data-action="nav" data-view="projects">전체 보기 →</button></div>
+        ${myActiveProjects.length ? `<div style="display:flex;flex-direction:column;gap:14px">${myActiveProjects.slice(0,3).map(projectMiniRow).join('')}</div>` : `<div class="empty"><div class="ei">◇</div>내가 담당하는 진행 중 프로젝트가 없어요</div>`}
       </div>
       <div class="card">
         <div class="card-header"><div class="card-title">☷ 최근 회의록</div><button class="btn btn-ghost btn-sm" data-action="nav" data-view="meetings">전체 보기 →</button></div>
@@ -2035,16 +2161,25 @@ function renderDailyList(tasks, selDate) {
 // ====== PROJECTS ======
 function renderProjects() {
   if (!state.projects.length) return `
-    ${renderPjFilterBar('all')}
+    ${renderPjFilterBar('mine')}
     <div class="empty"><div class="ei">◇</div>프로젝트가 없어요. + 새 프로젝트로 추가해 보세요.</div>
   `;
 
-  const f = session.projectBrandFilter || 'all';
+  // Default filter: 'mine' (my projects). Falls back to first brand.
+  let f = session.projectBrandFilter;
+  if (!f || (f !== 'done' && f !== 'all' && f !== 'mine' && !state.brands.find(b => b.id === f))) {
+    f = 'mine';
+    session.projectBrandFilter = f;
+  }
+  const meId = session.currentUserId;
+  const myProjectIds = new Set(state.tasks.filter(t => t.assigneeId === meId).map(t => t.projectId).filter(Boolean));
   let filtered;
   if (f === 'done') {
     filtered = state.projects.filter(p => p.status === 'done');
   } else if (f === 'all') {
     filtered = state.projects.filter(p => p.status !== 'done');
+  } else if (f === 'mine') {
+    filtered = state.projects.filter(p => p.status !== 'done' && myProjectIds.has(p.id));
   } else {
     filtered = state.projects.filter(p => p.brandId === f && p.status !== 'done');
   }
@@ -2057,6 +2192,7 @@ function renderProjects() {
     let msg;
     if (f === 'done') msg = '완료된 프로젝트가 아직 없어요.';
     else if (f === 'all') msg = '진행 중인 프로젝트가 없어요.';
+    else if (f === 'mine') msg = '내가 담당하는 프로젝트가 없어요. 다른 브랜드 칩을 눌러서 보세요.';
     else { const b = brand(f); msg = `${b ? esc(b.name) + ' 브랜드' : '선택한 필터'}의 진행 중 프로젝트가 없어요.`; }
     return `${renderPjFilterBar(f)}<div class="empty"><div class="ei">◇</div>${msg}</div>`;
   }
@@ -2069,11 +2205,18 @@ function renderProjects() {
 }
 
 function renderPjFilterBar(active) {
-  const counts = { all: state.projects.filter(p => p.status !== 'done').length, done: state.projects.filter(p => p.status === 'done').length };
+  const meId = session.currentUserId;
+  const myProjectIds = new Set(state.tasks.filter(t => t.assigneeId === meId).map(t => t.projectId).filter(Boolean));
+  const counts = {
+    all: state.projects.filter(p => p.status !== 'done').length,
+    done: state.projects.filter(p => p.status === 'done').length,
+    mine: state.projects.filter(p => p.status !== 'done' && myProjectIds.has(p.id)).length,
+  };
   state.brands.forEach(b => { counts[b.id] = state.projects.filter(p => p.brandId === b.id && p.status !== 'done').length; });
   return `
     <div class="pj-filter-bar">
-      <span class="pj-filter-chip ${active==='all'?'active':''}" data-action="pj-filter" data-brand="all">전체<span class="pj-filter-count">${counts.all}</span></span>
+      <span class="pj-filter-chip pj-filter-mine ${active==='mine'?'active':''}" data-action="pj-filter" data-brand="mine">⭐ 내 프로젝트<span class="pj-filter-count">${counts.mine}</span></span>
+      <span class="pj-filter-divider"></span>
       ${state.brands.map(b => `
         <span class="pj-filter-chip ${active===b.id?'active':''}" data-action="pj-filter" data-brand="${b.id}" style="${active===b.id?`background:${b.color};border-color:${b.color};color:white`:''}">${esc(b.name)}<span class="pj-filter-count">${counts[b.id]}</span></span>
       `).join('')}
@@ -2573,56 +2716,82 @@ function renderKPIs() {
   session.kpiCollapsed = session.kpiCollapsed || {};
 
   // Helper: render single KPI item with accordion expansion
-  function kpiItemHtml(k) {
+  // 전체 view: collapsed by default, click row to toggle
+  // 상세 view (forceOpen=true): always expanded with project-grouped tasks
+  function kpiItemHtml(k, forceOpen = false) {
     const p = kpiProgress(k);
     const pct = p.pct;
     const kCls = pct >= 80 ? 'hi' : pct >= 40 ? 'mid' : 'lo';
     const kBar = pct >= 80 ? 'var(--success)' : pct >= 40 ? 'var(--primary)' : 'var(--danger)';
-    const isOpen = !!session.kpiItemOpen?.[k.id];
+    // Open state: detail mode always open; 전체 mode uses transient in-memory toggle
+    const isOpen = forceOpen || (window._kpiOpen && window._kpiOpen.has(k.id));
 
     let accHtml = '';
     if (isOpen) {
       const linkedProjects = state.projects.filter(p => p.kpiId === k.id);
-      const linkedTasks = state.tasks.filter(t => t.kpiId === k.id);
+      const allLinkedTasks = state.tasks.filter(t => t.kpiId === k.id);
+      const orphanTasks = allLinkedTasks.filter(t => !t.projectId || !linkedProjects.find(p => p.id === t.projectId));
+
+      const renderTaskRow = (t) => {
+        const a = state.members.find(m => m.id === t.assigneeId);
+        const isDone = isTaskDoneOn(t, todayStr());
+        const statusLbl = isDone ? '완료' : (t.status === 'doing' ? '진행' : '대기');
+        return `
+          <div class="kpi-dash-acc-task ${isDone?'done':''}" data-action="open-task" data-id="${t.id}">
+            <span class="kpi-dash-acc-task-avatar">${a ? avatar(a, 20) : ''}</span>
+            <span class="kpi-dash-acc-task-title">${esc(t.title)}</span>
+            <span class="kpi-dash-acc-task-status">${statusLbl}</span>
+          </div>
+        `;
+      };
+
       accHtml = `
         <div class="kpi-dash-accordion">
-          <div class="kpi-dash-acc-section">
-            <div class="kpi-dash-acc-label">연결된 프로젝트<span class="cnt">${linkedProjects.length}</span></div>
-            ${linkedProjects.length ? linkedProjects.map(p => {
-              const prog = projectProgress(p.id);
-              return `
-                <div class="kpi-dash-acc-project" data-action="open-project" data-id="${p.id}">
-                  <div class="kpi-dash-acc-project-title">${esc(p.name)}</div>
-                  <div class="kpi-dash-acc-project-meta">진행률 ${prog}%</div>
+          ${linkedProjects.length === 0 && orphanTasks.length === 0 ? `
+            <div class="kpi-dash-acc-empty">연결된 프로젝트·업무 없음</div>
+          ` : ''}
+
+          ${linkedProjects.map(p => {
+            const projTasks = allLinkedTasks.filter(t => t.projectId === p.id);
+            const prog = projectProgress(p.id);
+            return `
+              <div class="kpi-dash-proj-block">
+                <div class="kpi-dash-proj-head" data-action="open-project" data-id="${p.id}">
+                  <span class="kpi-dash-proj-name">◇ ${esc(p.name)}</span>
+                  <span class="kpi-dash-proj-prog">진행률 ${prog}%</span>
                 </div>
-              `;
-            }).join('') : '<div class="kpi-dash-acc-empty">연결된 프로젝트 없음</div>'}
-          </div>
-          <div class="kpi-dash-acc-section">
-            <div class="kpi-dash-acc-label">연결된 업무<span class="cnt">${linkedTasks.length}</span></div>
-            ${linkedTasks.length ? linkedTasks.slice(0, 10).map(t => {
-              const a = state.members.find(m => m.id === t.assigneeId);
-              const br = brand(t.brandId);
-              const isDone = isTaskDoneOn(t, todayStr());
-              const statusLbl = isDone ? '완료' : (t.status === 'doing' ? '진행' : '대기');
-              return `
-                <div class="kpi-dash-acc-task ${isDone?'done':''}" data-action="open-task" data-id="${t.id}">
-                  <span class="kpi-dash-acc-task-avatar">${a ? avatar(a, 20) : ''}</span>
-                  <span class="kpi-dash-acc-task-title">${esc(t.title)}</span>
-                  ${br ? `<span class="kpi-dash-acc-task-brand" style="color:${br.color}">${esc(br.name)}</span>` : ''}
-                  <span class="kpi-dash-acc-task-status">${statusLbl}</span>
-                </div>
-              `;
-            }).join('') + (linkedTasks.length > 10 ? `<div class="kpi-dash-acc-empty">외 ${linkedTasks.length-10}개 더</div>` : '') : '<div class="kpi-dash-acc-empty">연결된 업무 없음</div>'}
-          </div>
+                ${projTasks.length ? `
+                  <div class="kpi-dash-proj-tasks">
+                    ${projTasks.slice(0, 8).map(renderTaskRow).join('')}
+                    ${projTasks.length > 8 ? `<div class="kpi-dash-acc-empty">외 ${projTasks.length-8}개 더</div>` : ''}
+                  </div>
+                ` : `<div class="kpi-dash-acc-empty kpi-dash-proj-empty">이 프로젝트에 연결된 업무 없음</div>`}
+              </div>
+            `;
+          }).join('')}
+
+          ${orphanTasks.length > 0 ? `
+            <div class="kpi-dash-proj-block">
+              <div class="kpi-dash-proj-head" style="cursor:default">
+                <span class="kpi-dash-proj-name" style="color:var(--text-muted)">◌ 프로젝트 없는 업무</span>
+                <span class="kpi-dash-proj-prog">${orphanTasks.length}개</span>
+              </div>
+              <div class="kpi-dash-proj-tasks">
+                ${orphanTasks.slice(0, 8).map(renderTaskRow).join('')}
+                ${orphanTasks.length > 8 ? `<div class="kpi-dash-acc-empty">외 ${orphanTasks.length-8}개 더</div>` : ''}
+              </div>
+            </div>
+          ` : ''}
         </div>
       `;
     }
 
+    // 전체 view: row toggles accordion. Detail view: not clickable.
+    const itemAction = forceOpen ? '' : `data-action="kpi-item-toggle" data-id="${k.id}"`;
     return `
-      <div class="kpi-dash-kitem ${isOpen?'open':''}" data-action="kpi-item-toggle" data-id="${k.id}">
+      <div class="kpi-dash-kitem ${isOpen?'open':''} ${forceOpen?'force-open':''}" ${itemAction}>
         <div class="kpi-dash-kitem-row">
-          <span class="kpi-dash-kitem-arrow">▶</span>
+          ${forceOpen ? '' : '<span class="kpi-dash-kitem-arrow">▶</span>'}
           <span class="kpi-dash-kitem-title">${esc(k.title)}${p.isAuto ? ' <span class="kpi-auto-badge">자동</span>' : ''}</span>
           <span class="kpi-dash-kitem-val"><span class="knum">${p.current}</span> / ${p.target} ${esc(p.unit)}</span>
           <button class="kpi-dash-kitem-edit" data-action="open-kpi" data-id="${k.id}" title="수정">✎</button>
@@ -2710,6 +2879,51 @@ function renderKPIs() {
   }
 
   const hasAnything = brandsToShow.length > 0 || noBrandHtml;
+
+  // === FILTERED (DETAIL) MODE: single brand selected ===
+  // Show brand summary card at top + KPI cards in 3-column grid (always expanded)
+  if (isFiltered && brandsToShow.length === 1 && brandsToShow[0].id !== '__none__') {
+    const b = brandsToShow[0];
+    const bKpis = state.kpis.filter(k => k.brandId === b.id);
+    const hasKpis = bKpis.length > 0;
+    const avg = hasKpis ? Math.round(bKpis.reduce((s,k) => s + kpiProgress(k).pct, 0) / bKpis.length) : 0;
+    const pctCls = !hasKpis ? 'none' : avg >= 80 ? 'hi' : avg >= 40 ? 'mid' : 'lo';
+    const goalText = b.goal || '';
+    const initial = (b.name || '').charAt(0);
+
+    return `
+      ${renderTeamGoalCards()}
+      ${renderKpiFilterBar(f)}
+      <div class="kpi-detail-brand-card">
+        <div class="kpi-dash-top">
+          <div class="kpi-dash-logo-wrap">
+            <div class="kpi-dash-logo" style="background:${b.color}">${esc(initial)}</div>
+            <span class="kpi-dash-tag" style="color:${b.color}">브랜드</span>
+          </div>
+          <div class="kpi-dash-pct ${pctCls}">${hasKpis ? avg + '%' : 'KPI 없음'}</div>
+        </div>
+        <div class="kpi-dash-name">${esc(b.name)}</div>
+        <div class="kpi-dash-goal ${goalText?'':'empty'}" data-action="edit-brand-goal" data-id="${b.id}" title="${goalText?'클릭하면 수정':'클릭하면 작성'}">${goalText ? esc(goalText) : '목표를 입력하세요 (클릭)'}</div>
+      </div>
+
+      <div class="kpi-detail-section-label">📊 ${esc(b.name)} KPI 상세</div>
+      ${hasKpis ? `
+        <div class="kpi-detail-grid">
+          ${bKpis.map(k => `<div class="kpi-detail-card">${kpiItemHtml(k, true)}</div>`).join('')}
+          <button class="kpi-detail-add" data-action="new-kpi-for-brand" data-id="${b.id}">
+            <span class="add-icon">+</span>
+            <span>KPI 추가</span>
+          </button>
+        </div>
+      ` : `
+        <div class="kpi-detail-empty">
+          <div class="ei">↗</div>
+          <div class="eih">아직 KPI가 없어요</div>
+          <button class="btn btn-primary btn-sm" data-action="new-kpi-for-brand" data-id="${b.id}" style="margin-top:12px">+ 첫 KPI 추가</button>
+        </div>
+      `}
+    `;
+  }
 
   return `
     ${renderTeamGoalCards()}
@@ -3185,6 +3399,145 @@ async function actionTgDeleteYear(cardId, year) {
   render();
 }
 
+// ====== TRASH ======
+function renderTrash() {
+  const items = state.trash || [];
+  const filter = session.trashFilter || 'all';
+  const filtered = filter === 'all' ? items : items.filter(i => i.kind === filter);
+  const counts = {
+    all: items.length,
+    task: items.filter(i => i.kind === 'task').length,
+    project: items.filter(i => i.kind === 'project').length,
+    note: items.filter(i => i.kind === 'note').length,
+  };
+
+  function itemRow(item) {
+    const days = trashDaysLeft(item);
+    const daysCls = days <= 1 ? 'urgent' : days <= 3 ? 'soon' : '';
+    const icons = { task: '✓', project: '◇', note: '📝' };
+    let title = '';
+    let subtitle = '';
+    if (item.kind === 'task') {
+      title = item.data.title || '(제목 없음)';
+      subtitle = item.data.type === 'oneoff' ? '단일 업무' : item.data.type === 'daily' ? '일일 루틴' : item.data.type === 'weekly' ? '주간 루틴' : '장기 업무';
+    } else if (item.kind === 'project') {
+      title = item.data.name || '(이름 없음)';
+      const taskCount = (item.extra?.taskIds || []).length;
+      subtitle = taskCount > 0 ? `연결된 업무 ${taskCount}개 (복원 시 다시 연결)` : '연결된 업무 없음';
+    } else if (item.kind === 'note') {
+      const c = item.data.content || '';
+      title = c.slice(0, 60) + (c.length > 60 ? '...' : '') || `[이미지 ${(item.data.images||[]).length}장]`;
+      subtitle = `프로젝트: ${item.extra?.projectName || '(삭제된 프로젝트)'}`;
+    }
+    const deletedBy = state.members.find(m => m.id === item.deletedBy);
+    const dt = new Date(item.deletedAt);
+    const dateStr = `${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+    return `
+      <div class="trash-item">
+        <div class="trash-item-icon">${icons[item.kind] || '?'}</div>
+        <div class="trash-item-main">
+          <div class="trash-item-title">${esc(title)}</div>
+          <div class="trash-item-meta">
+            <span class="trash-item-kind">${TRASH_KIND_LABEL[item.kind] || item.kind}</span>
+            <span>${esc(subtitle)}</span>
+            <span>· ${dateStr}${deletedBy ? ` · ${esc(deletedBy.name)}` : ''}</span>
+            <span class="trash-item-days ${daysCls}">· ${days}일 남음</span>
+          </div>
+        </div>
+        <div class="trash-item-actions">
+          <button class="btn btn-secondary btn-sm" data-action="trash-restore" data-id="${item.id}">↺ 복원</button>
+          <button class="btn btn-danger btn-sm" data-action="trash-purge" data-id="${item.id}">영구 삭제</button>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="trash-page">
+      <div class="trash-head">
+        <div class="trash-info">🗑 휴지통의 항목은 <strong>7일 후 자동으로 영구 삭제</strong>됩니다.</div>
+        ${items.length > 0 ? `<button class="btn btn-danger btn-sm" data-action="trash-empty-all">전체 비우기</button>` : ''}
+      </div>
+      <div class="trash-filter">
+        <span class="trash-filter-chip ${filter==='all'?'active':''}" data-action="trash-filter" data-id="all">전체 (${counts.all})</span>
+        <span class="trash-filter-chip ${filter==='task'?'active':''}" data-action="trash-filter" data-id="task">✓ 업무 (${counts.task})</span>
+        <span class="trash-filter-chip ${filter==='project'?'active':''}" data-action="trash-filter" data-id="project">◇ 프로젝트 (${counts.project})</span>
+        <span class="trash-filter-chip ${filter==='note'?'active':''}" data-action="trash-filter" data-id="note">📝 노트 (${counts.note})</span>
+      </div>
+      ${filtered.length === 0 ? `
+        <div class="trash-empty">
+          <div class="ei">🗑</div>
+          <div class="eih">${items.length === 0 ? '휴지통이 비어 있어요' : '해당 항목이 없어요'}</div>
+          <div>삭제한 ${TRASH_KIND_LABEL[filter] || '항목'}이 여기 표시됩니다.</div>
+        </div>
+      ` : `
+        <div class="trash-list">${filtered.map(itemRow).join('')}</div>
+      `}
+    </div>
+  `;
+}
+
+async function actionTrashRestore(itemId) {
+  const item = state.trash.find(i => i.id === itemId);
+  if (!item) return;
+  if (item.kind === 'task') {
+    state.tasks.push(item.data);
+  } else if (item.kind === 'project') {
+    state.projects.push(item.data);
+    // Re-link tasks if they still exist and aren't linked elsewhere
+    (item.extra?.taskIds || []).forEach(tid => {
+      const t = state.tasks.find(x => x.id === tid);
+      if (t && !t.projectId) t.projectId = item.data.id;
+    });
+  } else if (item.kind === 'note') {
+    const p = state.projects.find(x => x.id === item.extra?.projectId);
+    if (!p) {
+      alert('이 노트가 속했던 프로젝트가 없어요. 노트는 복원할 수 없습니다.');
+      return;
+    }
+    p.notes = p.notes || [];
+    p.notes.push(item.data);
+  }
+  state.trash = state.trash.filter(i => i.id !== itemId);
+  logAct(`복원: ${TRASH_KIND_LABEL[item.kind]}`);
+  await saveState(); render();
+}
+
+async function actionTrashPurge(itemId) {
+  const item = state.trash.find(i => i.id === itemId);
+  if (!item) return;
+  showConfirm({
+    title: '영구 삭제할까요?',
+    message: '이 작업은 되돌릴 수 없어요.',
+    confirmText: '영구 삭제',
+    danger: true,
+    onConfirm: async () => {
+      state.trash = state.trash.filter(i => i.id !== itemId);
+      await saveState(); render();
+    },
+  });
+}
+
+async function actionTrashEmptyAll() {
+  if (state.trash.length === 0) return;
+  showConfirm({
+    title: '휴지통을 전체 비울까요?',
+    message: `${state.trash.length}개 항목이 영구 삭제됩니다. 되돌릴 수 없어요.`,
+    confirmText: '전체 비우기',
+    danger: true,
+    onConfirm: async () => {
+      state.trash = [];
+      logAct('휴지통 전체 비움');
+      await saveState(); render();
+    },
+  });
+}
+
+function actionTrashFilter(id) {
+  session.trashFilter = id;
+  render();
+}
+
 // ====== TEAM ======
 function renderTeam() {
   return `
@@ -3269,6 +3622,8 @@ function renderModal() {
   el.className = 'modal-backdrop';
   el.innerHTML = session.modal.html;
   el.addEventListener('click', (e) => { if (e.target === el) closeModal(); });
+  // Prevent ANY <form> inside modal from submitting (would cause unintended navigation)
+  el.addEventListener('submit', (e) => e.preventDefault());
   document.body.appendChild(el);
 }
 function closeModal() { session.modal = null; const e = document.querySelector('.modal-backdrop'); if (e) e.remove(); }
@@ -3572,9 +3927,20 @@ async function actionSaveTask(id) {
   closeModal(); await saveState(); render();
 }
 async function actionDeleteTask(id) {
-  if (!confirm('이 업무를 삭제할까요?')) return;
-  state.tasks = state.tasks.filter(t => t.id !== id);
-  closeModal(); await saveState(); render();
+  const t = state.tasks.find(x => x.id === id);
+  if (!t) return;
+  showConfirm({
+    title: '업무를 휴지통으로 옮길까요?',
+    message: `"${esc(t.title)}"<br>휴지통에서 7일간 복원할 수 있어요.`,
+    confirmText: '휴지통으로',
+    danger: true,
+    onConfirm: async () => {
+      moveToTrash('task', t);
+      state.tasks = state.tasks.filter(x => x.id !== id);
+      logAct(`업무 삭제: ${t.title}`);
+      closeModal(); await saveState(); render();
+    },
+  });
 }
 
 async function actionSaveProject(id) {
@@ -3625,10 +3991,24 @@ async function actionSaveProject(id) {
   closeModal(); await saveState(); render();
 }
 async function actionDeleteProject(id) {
-  if (!confirm('프로젝트를 삭제할까요? 연결된 업무들의 프로젝트 정보가 해제됩니다.')) return;
-  state.projects = state.projects.filter(p => p.id !== id);
-  state.tasks.forEach(t => { if (t.projectId === id) t.projectId = null; });
-  closeModal(); await saveState(); render();
+  const p = state.projects.find(x => x.id === id);
+  if (!p) return;
+  const linkedTasks = state.tasks.filter(t => t.projectId === id);
+  showConfirm({
+    title: '프로젝트를 휴지통으로 옮길까요?',
+    message: `"${esc(p.name)}"<br>${linkedTasks.length > 0 ? `연결된 업무 ${linkedTasks.length}개의 프로젝트 정보가 해제됩니다.<br>` : ''}휴지통에서 7일간 복원할 수 있어요.`,
+    confirmText: '휴지통으로',
+    danger: true,
+    onConfirm: async () => {
+      // Save links before unlinking so restore can rewire
+      const taskLinks = linkedTasks.map(t => t.id);
+      moveToTrash('project', p, { taskIds: taskLinks });
+      state.projects = state.projects.filter(x => x.id !== id);
+      state.tasks.forEach(t => { if (t.projectId === id) t.projectId = null; });
+      logAct(`프로젝트 삭제: ${p.name}`);
+      closeModal(); await saveState(); render();
+    },
+  });
 }
 
 async function actionSaveMeeting(id) {
@@ -4184,9 +4564,20 @@ async function actionToggleBookmark(taskId) {
 }
 
 async function actionDeleteTaskQuick(taskId) {
-  if (!confirm('이 업무를 삭제할까요?')) return;
-  state.tasks = state.tasks.filter(t => t.id !== taskId);
-  await saveState(); render();
+  const t = state.tasks.find(x => x.id === taskId);
+  if (!t) return;
+  showConfirm({
+    title: '업무를 휴지통으로 옮길까요?',
+    message: `"${esc(t.title)}"<br>휴지통에서 7일간 복원할 수 있어요.`,
+    confirmText: '휴지통으로',
+    danger: true,
+    onConfirm: async () => {
+      moveToTrash('task', t);
+      state.tasks = state.tasks.filter(x => x.id !== taskId);
+      logAct(`업무 삭제: ${t.title}`);
+      await saveState(); render();
+    },
+  });
 }
 
 async function actionNewTaskOfType(type, date) {
@@ -4293,10 +4684,23 @@ async function actionAddNote(projectId) {
   await saveState(); render();
 }
 async function actionDeleteNote(projectId, noteId) {
-  if (!confirm('이 노트를 삭제할까요?')) return;
   const p = state.projects.find(x => x.id === projectId);
-  p.notes = (p.notes || []).filter(n => n.id !== noteId);
-  await saveState(); render();
+  if (!p) return;
+  const note = (p.notes || []).find(n => n.id === noteId);
+  if (!note) return;
+  const previewText = (note.content || '').slice(0, 60) || (note.images?.length ? `[이미지 ${note.images.length}장]` : '');
+  showConfirm({
+    title: '노트를 휴지통으로 옮길까요?',
+    message: `${esc(previewText)}${(note.content||'').length > 60 ? '...' : ''}<br>휴지통에서 7일간 복원할 수 있어요.`,
+    confirmText: '휴지통으로',
+    danger: true,
+    onConfirm: async () => {
+      moveToTrash('note', note, { projectId, projectName: p.name });
+      p.notes = (p.notes || []).filter(n => n.id !== noteId);
+      logAct(`노트 삭제: ${p.name}`);
+      await saveState(); render();
+    },
+  });
 }
 async function actionAddComment(projectId) {
   const el = document.getElementById('pj-comment-input');
@@ -4492,8 +4896,10 @@ document.addEventListener('click', async (e) => {
       return render();
     }
     case 'kpi-item-toggle': {
-      session.kpiItemOpen = session.kpiItemOpen || {};
-      session.kpiItemOpen[id] = !session.kpiItemOpen[id];
+      // Use transient (in-memory) state — always starts collapsed on page load
+      window._kpiOpen = window._kpiOpen || new Set();
+      if (window._kpiOpen.has(id)) window._kpiOpen.delete(id);
+      else window._kpiOpen.add(id);
       return render();
     }
     case 'kpi-card-detail': {
@@ -4513,6 +4919,11 @@ document.addEventListener('click', async (e) => {
     case 'tpl-add-line': return actionTplAddLine();
     case 'tpl-remove-line': return actionTplRemoveLine(target.dataset.idx);
     case 'tpl-pick': return actionTplPick(id);
+
+    case 'trash-restore': return actionTrashRestore(id);
+    case 'trash-purge': return actionTrashPurge(id);
+    case 'trash-empty-all': return actionTrashEmptyAll();
+    case 'trash-filter': return actionTrashFilter(id);
 
     case 'save-member': return actionSaveMember(id);
     case 'save-team-name': return actionSaveTeamName();
