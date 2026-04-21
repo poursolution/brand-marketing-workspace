@@ -449,11 +449,13 @@
   .r-empty { text-align: center; padding: 18px; color: var(--text-muted); font-size: 12px; background: rgba(255,255,255,0.6); border-radius: 8px; }
 
   .dt-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-  .dt-head { display: grid; grid-template-columns: 28px 28px 1fr 120px 130px; gap: 8px; padding: 12px 16px; background: var(--surface-soft); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; color: var(--text-muted); align-items: center; }
+  .dt-head { display: grid; grid-template-columns: 28px 28px minmax(200px, 1fr) auto 120px 130px; gap: 8px; padding: 12px 16px; background: var(--surface-soft); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; color: var(--text-muted); align-items: center; }
   .dt-head .dh-prio { text-align: center; }
   .dt-head .dh-add { text-align: right; }
+  .dt-head .dh-proj, .dt-head .dh-brand { text-align: center; }
   .dt-head .dh-add button { padding: 6px 12px; background: var(--primary); color: white; border-radius: 8px; font-size: 12px; font-weight: 700; }
-  .dt-row { display: grid; grid-template-columns: 28px 28px 1fr 120px 130px; gap: 8px; padding: 10px 16px; align-items: center; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .dt-row { display: grid; grid-template-columns: 28px 28px minmax(200px, 1fr) auto 120px 130px; gap: 8px; padding: 10px 16px; align-items: center; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .dt-row .proj-cell, .dt-row .brand-cell { display: flex; justify-content: center; align-items: center; }
   .dt-row:last-child { border-bottom: none; }
   .dt-row:hover { background: var(--surface-soft); }
   .dt-row .drag { color: var(--text-light); cursor: grab; text-align: center; user-select: none; font-size: 12px; }
@@ -461,6 +463,15 @@
   .dt-row .chk input { width: 16px; height: 16px; cursor: pointer; }
   .dt-row .t-title { cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .dt-row .t-title.done { text-decoration: line-through; color: var(--text-muted); }
+  .dt-row .proj-cell { overflow: visible; }
+  .t-proj-tag {
+    display: inline-flex; align-items: center;
+    font-size: 11px; font-weight: 600; color: var(--primary);
+    background: var(--primary-soft); padding: 3px 8px; border-radius: 5px;
+    cursor: pointer; transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .t-proj-tag:hover { background: var(--primary); color: white; }
   .prio-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border-strong); cursor: pointer; margin: 0 auto; transition: all 0.15s; }
   .prio-dot.high { background: var(--danger); border-color: var(--danger); }
   .prio-dot.mid { background: var(--warning); border-color: var(--warning); }
@@ -475,9 +486,9 @@
 
   @media (max-width: 700px) {
     .dt-head { grid-template-columns: 28px 1fr 80px; gap: 6px; }
-    .dt-head .dh-sp1, .dt-head .dh-brand { display: none; }
+    .dt-head .dh-sp1, .dt-head .dh-brand, .dt-head .dh-proj { display: none; }
     .dt-row { grid-template-columns: 28px 1fr 80px; gap: 6px; padding: 10px 12px; }
-    .dt-row .drag, .dt-row .brand-cell { display: none; }
+    .dt-row .drag, .dt-row .brand-cell, .dt-row .proj-cell { display: none; }
   }
 
   /* === Meetings 2-pane === */
@@ -2259,6 +2270,7 @@ function renderDailyList(tasks, selDate) {
         <span></span>
         <span></span>
         <span>업무</span>
+        <span class="dh-proj">프로젝트</span>
         <span class="dh-brand">브랜드</span>
         <span class="dh-add"><button data-action="new-task-of-type" data-type="oneoff" data-date="${selDate}">+ 업무 추가</button></span>
       </div>
@@ -2266,11 +2278,13 @@ function renderDailyList(tasks, selDate) {
         sorted.map(t => {
           const d = isTaskDoneOn(t, selDate);
           const rolled = t.originalDate && t.originalDate !== t.date && selDate === t.date;
+          const proj = t.projectId ? state.projects.find(p => p.id === t.projectId) : null;
           return `
             <div class="dt-row">
               <span class="drag">⋮⋮</span>
               <span class="chk"><input type="checkbox" ${d?'checked':''} data-action="toggle-done" data-id="${t.id}" data-date="${selDate}"></span>
               <span class="t-title ${d?'done':''}" data-action="open-task" data-id="${t.id}">${esc(t.title)}${rolled?`<span style="font-size:10.5px;color:var(--warning);margin-left:6px;font-weight:500">↷ ${t.originalDate.slice(5).replace('-','/')}에서 이월</span>`:''}</span>
+              <span class="proj-cell">${proj ? `<span class="t-proj-tag" data-action="goto-project" data-id="${proj.id}" title="프로젝트로 이동">◇ ${esc(proj.name)}</span>` : '<span style="color:var(--text-light);font-size:11px">—</span>'}</span>
               <span class="brand-cell">${brandBadge(t.brandId) || '<span style="color:var(--text-light);font-size:11px">—</span>'}</span>
               <span class="actions">
                 <button data-action="toggle-bookmark" data-id="${t.id}" class="${t.bookmark?'bm-on':''}" title="북마크">${t.bookmark?'★':'☆'}</button>
@@ -5642,6 +5656,29 @@ document.addEventListener('click', async (e) => {
     case 'open-project': return actionSelectProject(id);
     case 'open-project-modal': return openProjectModal(id);
     case 'select-project': return actionSelectProject(id);
+    case 'goto-project': {
+      const proj = state.projects.find(p => p.id === id);
+      if (!proj) return;
+      session.view = 'projects';
+      // Pick the best filter so the project is visible AND view looks right:
+      // - done → 완료됨 탭
+      // - paused → 보류 탭
+      // - active → 'mine' if I'm assigned, else its brand tab (or 'all' fallback)
+      const meId = session.currentUserId;
+      const isMine = state.tasks.some(t => t.projectId === id && t.assigneeId === meId);
+      if (proj.status === 'done') session.projectBrandFilter = 'done';
+      else if (proj.status === 'paused') session.projectBrandFilter = 'paused';
+      else if (isMine) session.projectBrandFilter = 'mine';
+      else if (proj.brandId) session.projectBrandFilter = proj.brandId;
+      else session.projectBrandFilter = 'all';
+      // If landing on 'mine' and the project happens to be hidden, temporarily reveal it
+      if (session.projectBrandFilter === 'mine') {
+        const hidden = state.hiddenProjectsByUser?.[meId] || [];
+        if (hidden.includes(id)) session.showHiddenInMine = true;
+      }
+      session.selectedProjectId = id;
+      return render();
+    }
     case 'pj-tab': return actionPjTab(target.dataset.tab);
     case 'pj-filter': return actionPjFilter(target.dataset.brand);
     case 'done-brand-filter': {
