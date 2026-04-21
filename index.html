@@ -914,6 +914,30 @@
 <div id="app"><div class="loading">불러오는 중…</div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- Firebase SDKs (compat versions for browser script use) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script>
+// ====== FIREBASE INIT ======
+const firebaseConfig = {
+  apiKey: "AIzaSyCbpE4xMJqzew4_T5x32js1HcKdZ2umcWY",
+  authDomain: "brand-marketing-workspace.firebaseapp.com",
+  projectId: "brand-marketing-workspace",
+  storageBucket: "brand-marketing-workspace.firebasestorage.app",
+  messagingSenderId: "911291254935",
+  appId: "1:911291254935:web:d66955c43f4c9935adc1d2",
+};
+let firebaseDB = null;
+try {
+  firebase.initializeApp(firebaseConfig);
+  firebaseDB = firebase.firestore();
+  console.log('✓ Firebase connected');
+} catch (e) {
+  console.warn('Firebase init failed, falling back to localStorage:', e);
+}
+</script>
+
 <script>
 // ====== STATE ======
 const STORAGE_KEY = 'bm-workspace-v1';
@@ -948,10 +972,29 @@ const initialState = () => ({
 });
 
 // ====== STORAGE ======
-// Storage adapter: use window.storage in Claude, localStorage fallback elsewhere
+// Storage adapter: Firebase Firestore (primary), Claude window.storage, or localStorage fallback
 const hasClaudeStorage = typeof window !== 'undefined' && window.storage && typeof window.storage.set === 'function';
+const hasFirebase = !!firebaseDB;
+
+// In-memory cache & write debouncing
+let _saveTimer = null;
+let _pendingState = null;
+const FIRESTORE_DOC = 'workspace/main'; // single doc holds entire state
+
 const storageAdapter = {
   async get(key) {
+    if (hasFirebase) {
+      try {
+        const doc = await firebaseDB.doc(FIRESTORE_DOC).get();
+        if (doc.exists) {
+          const d = doc.data();
+          if (d && d.json) return { value: d.json };
+        }
+        return null;
+      } catch (e) {
+        console.warn('Firestore get failed, falling back', e);
+      }
+    }
     if (hasClaudeStorage) {
       try { return await window.storage.get(key, true); }
       catch { return null; }
@@ -962,6 +1005,25 @@ const storageAdapter = {
     } catch { return null; }
   },
   async set(key, value) {
+    if (hasFirebase) {
+      // Debounce writes to Firestore (avoid hammering on every keystroke)
+      _pendingState = value;
+      clearTimeout(_saveTimer);
+      _saveTimer = setTimeout(async () => {
+        try {
+          await firebaseDB.doc(FIRESTORE_DOC).set({
+            json: _pendingState,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        } catch (e) {
+          console.warn('Firestore set failed', e);
+        }
+        _pendingState = null;
+      }, 400);
+      // Also keep a local copy as backup
+      try { localStorage.setItem(key + '::backup', value); } catch {}
+      return;
+    }
     if (hasClaudeStorage) {
       try { await window.storage.set(key, value, true); }
       catch (e) { console.warn('Storage set failed', e); }
@@ -971,6 +1033,7 @@ const storageAdapter = {
     }
   },
   async getSession(key) {
+    // Session (which user am I) is always per-browser, never synced
     if (hasClaudeStorage) {
       try { return await window.storage.get(key, false); }
       catch { return null; }
@@ -987,6 +1050,16 @@ const storageAdapter = {
     } else {
       try { localStorage.setItem(key + '::session', value); } catch {}
     }
+  },
+  // Subscribe to realtime updates from other team members
+  subscribe(onUpdate) {
+    if (!hasFirebase) return null;
+    return firebaseDB.doc(FIRESTORE_DOC).onSnapshot(doc => {
+      if (doc.exists && doc.metadata.hasPendingWrites === false) {
+        const d = doc.data();
+        if (d && d.json) onUpdate(d.json);
+      }
+    }, err => console.warn('Realtime sub error', err));
   },
 };
 
@@ -4296,6 +4369,24 @@ document.addEventListener('keydown', (e) => {
     await loadSession();
     await rolloverTasks();
     render();
+
+    // Subscribe to realtime updates from other team members
+    if (storageAdapter.subscribe) {
+      let isFirstSnapshot = true;
+      storageAdapter.subscribe(async (jsonStr) => {
+        // Skip first snapshot (we just loaded it)
+        if (isFirstSnapshot) { isFirstSnapshot = false; return; }
+        try {
+          const incoming = JSON.parse(jsonStr);
+          // Don't overwrite if we have unsaved pending writes
+          if (_pendingState) return;
+          // Update state with remote changes
+          Object.assign(state, incoming);
+          // Re-render but preserve current view/modal
+          render();
+        } catch (e) { console.warn('Realtime update parse failed', e); }
+      });
+    }
   } catch (e) {
     console.error('Init failed', e);
     document.getElementById('app').innerHTML = '<div class="loading">오류가 발생했어요. 새로고침해 주세요.</div>';
