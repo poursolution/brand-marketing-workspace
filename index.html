@@ -5380,6 +5380,25 @@ async function actionSavePinnedMemo(value) {
 }
 
 async function actionSelectProject(id) {
+  const proj = state.projects.find(p => p.id === id);
+  if (!proj) return;
+  // If we're already on projects page, just select within the current filter (sidebar click)
+  // Only change filter when navigating in from elsewhere (KPI page, dashboard, etc.)
+  const navigatingIn = session.view !== 'projects';
+  if (navigatingIn) {
+    const meId = session.currentUserId;
+    const isMine = state.tasks.some(t => t.projectId === id && t.assigneeId === meId);
+    if (proj.status === 'done') session.projectBrandFilter = 'done';
+    else if (proj.status === 'paused') session.projectBrandFilter = 'paused';
+    else if (isMine) session.projectBrandFilter = 'mine';
+    else if (proj.brandId) session.projectBrandFilter = proj.brandId;
+    else session.projectBrandFilter = 'all';
+    // If hidden in 'mine' view, temporarily reveal
+    if (session.projectBrandFilter === 'mine') {
+      const hidden = state.hiddenProjectsByUser?.[meId] || [];
+      if (hidden.includes(id)) session.showHiddenInMine = true;
+    }
+  }
   session.view = 'projects';
   session.selectedProjectId = id;
   session.projectTab = 'tasks';
