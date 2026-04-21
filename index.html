@@ -2864,7 +2864,7 @@ function renderKPIs() {
           ${forceOpen ? '' : `<span class="kpi-dash-kitem-arrow">${isOpen?'▼':'▶'}</span>`}
           <span class="kpi-dash-kitem-title">${esc(k.title)}${p.isAuto ? ' <span class="kpi-auto-badge">자동</span>' : ''}</span>
           <span class="kpi-dash-kitem-val"><span class="knum">${p.current}</span> / ${p.target} ${esc(p.unit)}</span>
-          <button class="kpi-dash-kitem-edit" data-action="open-kpi" data-id="${k.id}" title="수정" onclick="event.stopPropagation()">✎</button>
+          <button class="kpi-dash-kitem-edit" data-action="open-kpi" data-id="${k.id}" title="수정">✎</button>
           <span class="kpi-dash-kitem-pct ${kCls}">${pct}%</span>
         </div>
         <div class="kpi-dash-kitem-bar"><div style="width:${pct}%;background:${kBar}"></div></div>
