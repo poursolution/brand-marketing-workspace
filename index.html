@@ -1634,9 +1634,22 @@ function projectProgress(projectId) {
 function kpiProgress(k) {
   if (!k) return { pct: 0, current: 0, target: 0, unit: '', isAuto: false };
   if (k.mode === 'auto') {
-    const linked = state.tasks.filter(t => t.kpiId === k.id);
-    const target = linked.length;
-    const current = linked.filter(t => t.status === 'done').length;
+    // Find directly linked tasks
+    const directIds = new Set(state.tasks.filter(t => t.kpiId === k.id).map(t => t.id));
+    // Find projects linked to this KPI, then include their tasks
+    const projectIds = state.projects.filter(p => p.kpiId === k.id).map(p => p.id);
+    const projectTaskIds = new Set(
+      state.tasks.filter(t => t.projectId && projectIds.includes(t.projectId)).map(t => t.id)
+    );
+    // Combine (de-dup), then exclude routine tasks (only count one-off project work)
+    const allLinked = state.tasks.filter(t => (directIds.has(t.id) || projectTaskIds.has(t.id)) && t.type === 'oneoff');
+    const target = allLinked.length;
+    // For oneoff tasks, "completion" lives in completions[date] — done if any date is true
+    const current = allLinked.filter(t => {
+      if (t.status === 'done') return true;
+      const c = t.completions || {};
+      return Object.values(c).some(v => v === true);
+    }).length;
     const pct = target === 0 ? 0 : Math.min(100, Math.round(current/target*100));
     return { pct, current, target, unit: '개', isAuto: true };
   }
@@ -3061,8 +3074,14 @@ function renderKPIs() {
     let accHtml = '';
     if (isOpen) {
       const linkedProjects = state.projects.filter(p => p.kpiId === k.id);
-      const allLinkedTasks = state.tasks.filter(t => t.kpiId === k.id);
-      const orphanTasks = allLinkedTasks.filter(t => !t.projectId || !linkedProjects.find(p => p.id === t.projectId));
+      const linkedProjectIds = new Set(linkedProjects.map(p => p.id));
+      // All tasks counted toward this KPI: directly linked OR belonging to a linked project
+      // (only oneoff types, matching kpiProgress logic)
+      const allLinkedTasks = state.tasks.filter(t =>
+        t.type === 'oneoff' && (t.kpiId === k.id || (t.projectId && linkedProjectIds.has(t.projectId)))
+      );
+      // Orphans: directly linked but project not linked to this KPI (or no project)
+      const orphanTasks = allLinkedTasks.filter(t => !t.projectId || !linkedProjectIds.has(t.projectId));
 
       const renderTaskRow = (t) => {
         const a = state.members.find(m => m.id === t.assigneeId);
