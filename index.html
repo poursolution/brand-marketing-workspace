@@ -800,6 +800,28 @@
   .pj-note-side .ndel:hover { background: var(--danger-soft); }
   .pj-note-content { font-size: 13px; line-height: 1.65; white-space: pre-wrap; }
 
+  /* Note images */
+  .pj-note-images { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .pj-note-img { max-width: 200px; max-height: 200px; border-radius: 6px; cursor: zoom-in; border: 1px solid var(--border); object-fit: cover; transition: transform 0.12s; }
+  .pj-note-img:hover { transform: scale(1.02); border-color: var(--primary); }
+
+  /* Pending images (in editor before save) */
+  .pj-note-pending { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 12px 0; }
+  .pj-note-pending-item { position: relative; width: 80px; height: 80px; border-radius: 6px; overflow: hidden; border: 1.5px solid var(--border); }
+  .pj-note-pending-item img { width: 100%; height: 100%; object-fit: cover; }
+  .pj-note-pending-item .pp-remove { position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .pj-note-pending-item .pp-remove:hover { background: var(--danger); }
+
+  /* Editor drag-over state */
+  .pj-note-editor.dragover { border-color: var(--primary); background: rgba(99,102,241,0.05); }
+
+  /* Lightbox */
+  .img-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 40px; cursor: zoom-out; }
+  .img-lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 4px 60px rgba(0,0,0,0.5); border-radius: 4px; }
+  .img-lightbox-close { position: absolute; top: 20px; right: 24px; background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .img-lightbox-close:hover { background: rgba(255,255,255,0.2); }
+  .img-lightbox-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 12px; }
+
   /* Comments */
   .pj-comment-form { display: flex; gap: 10px; padding: 14px; background: var(--surface-soft); border-radius: 10px; margin-bottom: 16px; align-items: flex-start; }
   .pj-comment-form .cf-body { flex: 1; }
@@ -828,7 +850,9 @@
   .pj-empty-soft .pesub { font-size: 12px; color: var(--text-muted); }
 
   /* === KPI Dashboard Grid (compact, above-fold) === */
-  .kpi-dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; align-items: stretch; }
+  .kpi-dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: stretch; }
+  @media (max-width: 1100px) { .kpi-dash-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px) { .kpi-dash-grid { grid-template-columns: 1fr; } }
 
   .kpi-dash-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 10px; transition: all 0.15s; position: relative; }
   .kpi-dash-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-color: var(--border-strong); }
@@ -908,6 +932,24 @@
   .kpi-dash-empty-kpis { padding: 12px 10px; text-align: center; font-size: 11.5px; color: var(--text-muted); background: var(--surface-soft); border-radius: 7px; font-style: italic; }
 
   .kpi-dash-section-label { font-size: 13px; font-weight: 700; color: var(--text); margin: 4px 0 14px; letter-spacing: -0.01em; }
+
+  /* KPI mode toggle in modal */
+  .kpi-mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpi-mode-opt { display: block; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 9px; cursor: pointer; transition: all 0.12s; background: var(--surface); }
+  .kpi-mode-opt:hover { border-color: var(--border-strong); }
+  .kpi-mode-opt.active { border-color: var(--primary); background: var(--primary-soft); }
+  .kpi-mode-opt input[type="radio"] { display: none; }
+  .kpi-mode-title { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .kpi-mode-desc { font-size: 11.5px; color: var(--text-muted); line-height: 1.4; }
+
+  /* Form 3-column row */
+  .form-row.row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .form-row.row-3 > div { display: flex; flex-direction: column; }
+  .form-row.row-3 > div > label { display: block; }
+  @media (max-width: 600px) { .form-row.row-3 { grid-template-columns: 1fr; } }
+
+  /* "자동" badge for auto-mode KPIs */
+  .kpi-auto-badge { display: inline-block; font-size: 9.5px; font-weight: 800; padding: 2px 6px; border-radius: 3px; background: var(--primary-soft); color: var(--primary); margin-left: 4px; vertical-align: 2px; letter-spacing: 0.04em; }
 </style>
 </head>
 <body>
@@ -1204,11 +1246,163 @@ async function rolloverTasks() {
   await saveState();
 }
 
+// ====== IMAGE UTILITIES ======
+// Compress an image File/Blob to JPEG base64, max dimension 1200px, quality 0.82
+function compressImage(fileOrBlob, maxDim = 1200, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round(height * (maxDim / width));
+            width = maxDim;
+          } else {
+            width = Math.round(width * (maxDim / height));
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        // JPEG with quality. PNG transparency lost — that's fine for screenshots.
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(fileOrBlob);
+  });
+}
+
+// Lightbox: show image full-screen
+function openLightbox(src) {
+  // Remove existing
+  document.querySelector('.img-lightbox')?.remove();
+  const lb = document.createElement('div');
+  lb.className = 'img-lightbox';
+  lb.innerHTML = `
+    <button class="img-lightbox-close" type="button">✕</button>
+    <img src="${src}" alt="">
+    <div class="img-lightbox-hint">아무 곳이나 클릭하면 닫혀요 · ESC</div>
+  `;
+  document.body.appendChild(lb);
+  const close = () => lb.remove();
+  lb.addEventListener('click', close);
+  const escHandler = (e) => { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escHandler); } };
+  document.addEventListener('keydown', escHandler);
+  // Don't close when clicking on the image itself? Actually, the example asks "click anywhere", so we keep it simple.
+  // Stop propagation on image so user can right-click → save without closing
+  lb.querySelector('img').addEventListener('click', (e) => { e.stopPropagation(); close(); });
+}
+
+// In-flight pending images for note editor (per project)
+const pendingNoteImages = {}; // { [projectId]: [dataUrl, ...] }
+
+async function handleNoteImageFiles(projectId, files) {
+  if (!files || !files.length) return;
+  pendingNoteImages[projectId] = pendingNoteImages[projectId] || [];
+  const wrap = document.getElementById('pj-note-pending');
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    try {
+      const dataUrl = await compressImage(file);
+      pendingNoteImages[projectId].push(dataUrl);
+      renderPendingImages(projectId);
+    } catch (e) {
+      console.warn('Image compress failed', e);
+    }
+  }
+}
+
+function renderPendingImages(projectId) {
+  const wrap = document.getElementById('pj-note-pending');
+  if (!wrap) return;
+  const arr = pendingNoteImages[projectId] || [];
+  wrap.innerHTML = arr.map((src, i) => `
+    <div class="pj-note-pending-item">
+      <img src="${src}" alt="">
+      <button type="button" class="pp-remove" onclick="window.removePendingImage('${projectId}', ${i})">✕</button>
+    </div>
+  `).join('');
+  wrap.style.display = arr.length ? 'flex' : 'none';
+}
+
+window.removePendingImage = function(projectId, idx) {
+  if (!pendingNoteImages[projectId]) return;
+  pendingNoteImages[projectId].splice(idx, 1);
+  renderPendingImages(projectId);
+};
+
+// Wire up paste & drag-drop after notes UI renders
+function attachNoteEditorEvents(projectId) {
+  const editor = document.querySelector('.pj-note-editor');
+  const textarea = document.getElementById('pj-note-input');
+  if (!editor || !textarea) return;
+
+  // Paste handler (Ctrl+V images)
+  textarea.addEventListener('paste', (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    const files = [];
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) files.push(file);
+      }
+    }
+    if (files.length) {
+      e.preventDefault();
+      handleNoteImageFiles(projectId, files);
+    }
+  });
+
+  // Drag & drop on editor
+  editor.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    editor.classList.add('dragover');
+  });
+  editor.addEventListener('dragleave', (e) => {
+    if (e.target === editor) editor.classList.remove('dragover');
+  });
+  editor.addEventListener('drop', (e) => {
+    e.preventDefault();
+    editor.classList.remove('dragover');
+    const files = [...(e.dataTransfer?.files || [])].filter(f => f.type.startsWith('image/'));
+    if (files.length) handleNoteImageFiles(projectId, files);
+  });
+}
+
 function projectProgress(projectId) {
   const tasks = state.tasks.filter(t => t.projectId === projectId);
   if (!tasks.length) return 0;
   const done = tasks.filter(t => t.status === 'done').length;
   return Math.round(done / tasks.length * 100);
+}
+
+// KPI progress — returns {pct, current, target, unit, isAuto}
+// Auto mode: derived from linked tasks (done count / total count)
+// Manual mode: current/target as entered
+function kpiProgress(k) {
+  if (!k) return { pct: 0, current: 0, target: 0, unit: '', isAuto: false };
+  if (k.mode === 'auto') {
+    const linked = state.tasks.filter(t => t.kpiId === k.id);
+    const target = linked.length;
+    const current = linked.filter(t => t.status === 'done').length;
+    const pct = target === 0 ? 0 : Math.min(100, Math.round(current/target*100));
+    return { pct, current, target, unit: '개', isAuto: true };
+  }
+  // Manual (default)
+  const target = k.target || 0;
+  const current = k.current || 0;
+  const pct = target === 0 ? 0 : Math.min(100, Math.round(current/target*100));
+  return { pct, current, target, unit: k.unit || '', isAuto: false };
 }
 
 // ====== RENDER ROOT ======
@@ -1482,7 +1676,7 @@ function renderDashboard() {
   const myTasks = state.tasks.filter(t => t.assigneeId === u.id && t.status !== 'done');
   const activeProjects = state.projects.filter(p => p.status === 'active');
   const pendingRequests = state.requests.filter(r => r.status === 'received' || r.status === 'doing');
-  const avgKpi = state.kpis.length ? Math.round(state.kpis.reduce((s, k) => s + Math.min(100, k.current/k.target*100), 0) / state.kpis.length) : 0;
+  const avgKpi = state.kpis.length ? Math.round(state.kpis.reduce((s, k) => s + kpiProgress(k).pct, 0) / state.kpis.length) : 0;
 
   const recentActivity = state.log.slice(0, 6);
   const upcomingTasks = [...state.tasks].filter(t => t.status !== 'done' && t.due).sort((a,b) => new Date(a.due) - new Date(b.due)).slice(0, 5);
@@ -1529,7 +1723,7 @@ function renderDashboard() {
           const bOpen = bTasks.filter(t => t.status !== 'done').length;
           const bProj = state.projects.filter(p => p.brandId === b.id && p.status === 'active').length;
           const bKpis = state.kpis.filter(k => k.brandId === b.id);
-          const avg = bKpis.length ? Math.round(bKpis.reduce((s,k) => s + Math.min(100, k.current/k.target*100), 0) / bKpis.length) : 0;
+          const avg = bKpis.length ? Math.round(bKpis.reduce((s,k) => s + kpiProgress(k).pct, 0) / bKpis.length) : 0;
           return `
             <div data-action="filter-by-brand" data-id="${b.id}" style="cursor:pointer;padding:14px;background:${b.color}0d;border:1px solid ${b.color}33;border-radius:10px">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px"><span style="width:8px;height:8px;border-radius:50%;background:${b.color}"></span><span style="font-weight:700;font-size:13px">${esc(b.name)}</span></div>
@@ -1610,15 +1804,15 @@ function taskListItemReadonly(t) {
 }
 
 function kpiMiniRow(k) {
-  const pct = Math.min(100, Math.round(k.current/k.target*100));
-  const cls = pct >= 80 ? 'success' : pct >= 40 ? '' : 'danger';
+  const p = kpiProgress(k);
+  const cls = p.pct >= 80 ? 'success' : p.pct >= 40 ? '' : 'danger';
   return `
     <div data-action="open-kpi" data-id="${k.id}" style="cursor:pointer">
       <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
         <span style="font-weight:600">${esc(k.title)}</span>
-        <span style="color:var(--text-muted)">${k.current}/${k.target} ${esc(k.unit)} · ${pct}%</span>
+        <span style="color:var(--text-muted)">${p.current}/${p.target} ${esc(p.unit)} · ${p.pct}%</span>
       </div>
-      <div class="progress"><div class="progress-bar ${cls}" style="width:${pct}%"></div></div>
+      <div class="progress"><div class="progress-bar ${cls}" style="width:${p.pct}%"></div></div>
     </div>
   `;
 }
@@ -2013,12 +2207,25 @@ function renderPjNotes(p, notes) {
   });
   const dates = Object.keys(grouped).sort().reverse();
 
+  // Schedule event wiring after DOM updates
+  setTimeout(() => {
+    attachNoteEditorEvents(p.id);
+    renderPendingImages(p.id);
+  }, 0);
+
   return `
     <div class="pj-note-editor">
-      <textarea id="pj-note-input" placeholder="진행경과, 중간 결과물, 문제점/이슈, 해결과정, 참고자료, 링크 등 여정을 기록해주세요"></textarea>
+      <textarea id="pj-note-input" placeholder="진행경과, 중간 결과물, 문제점/이슈, 해결과정, 참고자료, 링크 등 여정을 기록해주세요&#10;&#10;💡 스크린샷을 Ctrl+V로 붙여넣거나 파일을 드래그해 보세요"></textarea>
+      <div id="pj-note-pending" class="pj-note-pending" style="display:none"></div>
       <div class="pj-note-toolbar">
-        <span class="pj-note-hint">Ctrl+Enter로 저장</span>
-        <button class="btn btn-primary btn-sm" data-action="add-note" data-id="${p.id}">💾 저장</button>
+        <span class="pj-note-hint">Ctrl+Enter로 저장 · Ctrl+V로 이미지 붙여넣기</span>
+        <div style="display:flex;gap:6px">
+          <label class="btn btn-secondary btn-sm" style="margin:0;cursor:pointer">
+            🖼 이미지
+            <input type="file" accept="image/*" multiple style="display:none" onchange="window.handleNoteFileInput('${p.id}', this)">
+          </label>
+          <button class="btn btn-primary btn-sm" data-action="add-note" data-id="${p.id}">💾 저장</button>
+        </div>
       </div>
     </div>
     ${dates.length === 0 ? `<div class="pj-empty-soft"><div class="pei">📝</div><div class="pet">아직 노트가 없습니다</div><div class="pesub">위에 진행 과정을 기록해 보세요</div></div>` :
@@ -2028,13 +2235,19 @@ function renderPjNotes(p, notes) {
           const m = member(n.authorId);
           const dt = new Date(n.createdAt);
           const timeStr = `${dt.getHours() < 12 ? '오전' : '오후'} ${String((dt.getHours()%12)||12).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+          const images = n.images || [];
           return `
             <div class="pj-note-card">
               <div class="pj-note-head">
                 <div class="pj-note-author">${m ? avatar(m, 24) : ''}${esc(m?.name || '알 수 없음')}</div>
                 <div class="pj-note-side"><span>${timeStr}</span>${n.authorId === session.currentUserId ? `<span class="ndel" data-action="delete-note" data-pid="${p.id}" data-id="${n.id}">삭제</span>` : ''}</div>
               </div>
-              <div class="pj-note-content">${esc(n.content)}</div>
+              ${n.content ? `<div class="pj-note-content">${esc(n.content)}</div>` : ''}
+              ${images.length ? `
+                <div class="pj-note-images">
+                  ${images.map((src, i) => `<img class="pj-note-img" src="${src}" alt="" onclick="window.openLightbox(this.src)">`).join('')}
+                </div>
+              ` : ''}
             </div>
           `;
         }).join('')}
@@ -2042,6 +2255,13 @@ function renderPjNotes(p, notes) {
     }
   `;
 }
+
+// Expose for inline handlers
+window.openLightbox = openLightbox;
+window.handleNoteFileInput = function(projectId, input) {
+  handleNoteImageFiles(projectId, [...input.files]);
+  input.value = ''; // allow re-picking same file
+};
 
 function renderPjComments(p, comments) {
   const me_ = me();
@@ -2354,7 +2574,8 @@ function renderKPIs() {
 
   // Helper: render single KPI item with accordion expansion
   function kpiItemHtml(k) {
-    const pct = Math.min(100, Math.round(k.current/k.target*100));
+    const p = kpiProgress(k);
+    const pct = p.pct;
     const kCls = pct >= 80 ? 'hi' : pct >= 40 ? 'mid' : 'lo';
     const kBar = pct >= 80 ? 'var(--success)' : pct >= 40 ? 'var(--primary)' : 'var(--danger)';
     const isOpen = !!session.kpiItemOpen?.[k.id];
@@ -2402,8 +2623,8 @@ function renderKPIs() {
       <div class="kpi-dash-kitem ${isOpen?'open':''}" data-action="kpi-item-toggle" data-id="${k.id}">
         <div class="kpi-dash-kitem-row">
           <span class="kpi-dash-kitem-arrow">▶</span>
-          <span class="kpi-dash-kitem-title">${esc(k.title)}</span>
-          <span class="kpi-dash-kitem-val"><span class="knum">${k.current}</span> / ${k.target} ${esc(k.unit)}</span>
+          <span class="kpi-dash-kitem-title">${esc(k.title)}${p.isAuto ? ' <span class="kpi-auto-badge">자동</span>' : ''}</span>
+          <span class="kpi-dash-kitem-val"><span class="knum">${p.current}</span> / ${p.target} ${esc(p.unit)}</span>
           <button class="kpi-dash-kitem-edit" data-action="open-kpi" data-id="${k.id}" title="수정">✎</button>
           <span class="kpi-dash-kitem-pct ${kCls}">${pct}%</span>
         </div>
@@ -2416,7 +2637,7 @@ function renderKPIs() {
   // Helper to render one brand card
   function brandCardHtml(b, bKpis) {
     const hasKpis = bKpis.length > 0;
-    const avg = hasKpis ? Math.round(bKpis.reduce((s,k) => s + Math.min(100, k.current/k.target*100), 0) / bKpis.length) : 0;
+    const avg = hasKpis ? Math.round(bKpis.reduce((s,k) => s + kpiProgress(k).pct, 0) / bKpis.length) : 0;
     const pctCls = !hasKpis ? 'none' : avg >= 80 ? 'hi' : avg >= 40 ? 'mid' : 'lo';
     const barColor = avg >= 80 ? 'var(--success)' : avg >= 40 ? 'var(--primary)' : 'var(--danger)';
     const goalText = b.goal || '';
@@ -2458,7 +2679,7 @@ function renderKPIs() {
   // No-brand section (only when viewing "all" or "__none__")
   let noBrandHtml = '';
   if ((f === 'all' || f === '__none__') && noKpiKpis.length > 0) {
-    const avg = Math.round(noKpiKpis.reduce((s,k) => s + Math.min(100, k.current/k.target*100), 0) / noKpiKpis.length);
+    const avg = Math.round(noKpiKpis.reduce((s,k) => s + kpiProgress(k).pct, 0) / noKpiKpis.length);
     const pctCls = avg >= 80 ? 'hi' : avg >= 40 ? 'mid' : 'lo';
     const barColor = avg >= 80 ? 'var(--success)' : avg >= 40 ? 'var(--primary)' : 'var(--danger)';
     const collapsed = isFiltered ? false : !!session.kpiCollapsed['__none__'];
@@ -2576,7 +2797,7 @@ function renderGoals() {
   let overall = 0;
   const activeKpis = state.kpis.filter(k => projsByKpi[k.id]);
   if (activeKpis.length > 0) {
-    const sum = activeKpis.reduce((s, k) => s + Math.min(100, (k.target ? k.current/k.target*100 : 0)), 0);
+    const sum = activeKpis.reduce((s, k) => s + kpiProgress(k).pct, 0);
     overall = Math.round(sum / activeKpis.length);
   }
 
@@ -2704,14 +2925,15 @@ function renderGoalsKpiTree(kpis, projsByKpi, userId) {
     return '<div class="gl-empty-mini">연결된 KPI/프로젝트가 없어요. 프로젝트에 하위업무가 할당되면 여기에 표시됩니다.</div>';
   }
   return kpis.map(k => {
-    const pct = k.target ? Math.min(100, Math.round(k.current / k.target * 100)) : 0;
+    const p = kpiProgress(k);
+    const pct = p.pct;
     const projs = projsByKpi[k.id] || [];
     return `
       <div class="gl-kpi">
         <div class="gl-kpi-head">
           <span class="gl-kpi-dot"></span>
-          <span class="gl-kpi-name">${esc(k.title)}</span>
-          <span class="gl-kpi-sub">${k.current}/${k.target} ${esc(k.unit || '')}</span>
+          <span class="gl-kpi-name">${esc(k.title)}${p.isAuto ? ' <span class="kpi-auto-badge">자동</span>' : ''}</span>
+          <span class="gl-kpi-sub">${p.current}/${p.target} ${esc(p.unit || '')}</span>
           <div class="gl-kpi-bar-wrap">
             <div class="gl-kpi-bar"><div style="width:${pct}%"></div></div>
             <span class="gl-kpi-pct">${pct}%</span>
@@ -3246,19 +3468,20 @@ function openRequestModal(rId) {
 function openKPIModal(kId) {
   const k = kId ? state.kpis.find(x => x.id === kId) : null;
   const isEdit = !!k;
+  const mode = k?.mode || 'manual';
   const linkedProjects = isEdit ? state.projects.filter(p => p.kpiId === k.id) : [];
   const linkedTasks = isEdit ? state.tasks.filter(t => t.kpiId === k.id) : [];
-  const pct = isEdit ? Math.min(100, Math.round(k.current/k.target*100)) : 0;
+  const prog = isEdit ? kpiProgress(k) : { pct: 0, current: 0, target: 0, unit: '', isAuto: false };
   const linkedHtml = isEdit ? `
     <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
-      <div style="font-weight:600;font-size:13px;margin-bottom:8px">진행률</div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:8px">진행률 ${prog.isAuto ? '<span style="font-size:11px;color:var(--text-muted);font-weight:500">(자동)</span>' : ''}</div>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px">
-        <div class="progress" style="flex:1;height:10px"><div class="progress-bar" style="width:${pct}%"></div></div>
-        <span style="font-weight:700">${pct}%</span>
+        <div class="progress" style="flex:1;height:10px"><div class="progress-bar" style="width:${prog.pct}%"></div></div>
+        <span style="font-weight:700">${prog.pct}%</span>
       </div>
       <div style="font-weight:600;font-size:13px;margin-bottom:8px">연결된 프로젝트 (${linkedProjects.length})</div>
       ${linkedProjects.length ? `<div class="list" style="margin-bottom:12px">${linkedProjects.map(p => `<div class="list-item" data-action="open-project" data-id="${p.id}"><div class="li-main"><div class="li-title">${esc(p.name)}</div><div class="li-meta">진행률 ${projectProgress(p.id)}%</div></div></div>`).join('')}</div>` : '<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">없음</div>'}
-      <div style="font-weight:600;font-size:13px;margin-bottom:8px">연결된 업무 (${linkedTasks.length})</div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:8px">연결된 업무 (${linkedTasks.length}${prog.isAuto ? `, 완료 ${prog.current}/${prog.target}` : ''})</div>
       ${linkedTasks.length ? `<div class="list">${linkedTasks.slice(0,5).map(taskListItemReadonly).join('')}</div>` : '<div style="font-size:12px;color:var(--text-muted)">없음</div>'}
     </div>
   ` : '';
@@ -3269,14 +3492,36 @@ function openKPIModal(kId) {
         <form id="kpi-form">
           <div class="form-row"><label>지표명</label><input type="text" name="title" required value="${esc(k?.title || '')}" placeholder="예: 브랜드 인지도 향상"></div>
           <div class="form-row"><label>설명</label><textarea name="desc">${esc(k?.desc || '')}</textarea></div>
-          <div class="form-row row-2">
-            <div><label>기간</label><input type="text" name="period" value="${esc(k?.period || `${new Date().getFullYear()} Q${Math.floor(new Date().getMonth()/3)+1}`)}" placeholder="예: 2025 Q1"></div>
-            <div><label>단위</label><input type="text" name="unit" value="${esc(k?.unit || '%')}" placeholder="%, 건, 명"></div>
+
+          <div class="form-row">
+            <label>측정 방식</label>
+            <div class="kpi-mode-toggle">
+              <label class="kpi-mode-opt ${mode==='manual'?'active':''}">
+                <input type="radio" name="mode" value="manual" ${mode==='manual'?'checked':''} onchange="document.getElementById('kpi-mode-fields').style.display='block';this.closest('.kpi-mode-toggle').querySelectorAll('label').forEach(l=>l.classList.toggle('active',l.contains(this)))">
+                <div class="kpi-mode-title">📝 수동 입력</div>
+                <div class="kpi-mode-desc">목표값/현재값을 직접 입력 (예: 매출 38억)</div>
+              </label>
+              <label class="kpi-mode-opt ${mode==='auto'?'active':''}">
+                <input type="radio" name="mode" value="auto" ${mode==='auto'?'checked':''} onchange="document.getElementById('kpi-mode-fields').style.display='none';this.closest('.kpi-mode-toggle').querySelectorAll('label').forEach(l=>l.classList.toggle('active',l.contains(this)))">
+                <div class="kpi-mode-title">🤖 자동 계산</div>
+                <div class="kpi-mode-desc">연결된 업무 완료율로 자동 산정</div>
+              </label>
+            </div>
           </div>
-          <div class="form-row row-2">
-            <div><label>목표값</label><input type="number" name="target" required value="${k?.target ?? 100}" step="any"></div>
-            <div><label>현재값</label><input type="number" name="current" value="${k?.current ?? 0}" step="any"></div>
+
+          <div class="form-row">
+            <label>기간</label>
+            <input type="text" name="period" value="${esc(k?.period || `${new Date().getFullYear()} Q${Math.floor(new Date().getMonth()/3)+1}`)}" placeholder="예: 2025 Q1">
           </div>
+
+          <div id="kpi-mode-fields" style="display:${mode==='auto'?'none':'block'}">
+            <div class="form-row row-3">
+              <div><label>목표값</label><input type="number" name="target" value="${k?.target ?? 100}" step="any"></div>
+              <div><label>현재값</label><input type="number" name="current" value="${k?.current ?? 0}" step="any"></div>
+              <div><label>단위</label><input type="text" name="unit" value="${esc(k?.unit || '%')}" placeholder="%, 건, 명"></div>
+            </div>
+          </div>
+
           <div class="form-row"><label>브랜드</label><select name="brandId"><option value="">없음</option>${state.brands.map(b => {
             const isSel = k ? k.brandId===b.id : (session.kpiDefaultBrand === b.id);
             return `<option value="${b.id}" ${isSel?'selected':''}>${esc(b.name)}</option>`;
@@ -3489,13 +3734,23 @@ async function actionCompleteRequestQuick(id) {
 
 async function actionSaveKPI(id) {
   const f = document.getElementById('kpi-form');
+  const mode = f.mode?.value || 'manual';
   const data = {
     title: f.title.value.trim(), desc: f.desc.value,
-    period: f.period.value, unit: f.unit.value,
-    target: parseFloat(f.target.value) || 0,
-    current: parseFloat(f.current.value) || 0,
+    period: f.period.value,
+    mode,
     brandId: f.brandId.value || null,
   };
+  if (mode === 'manual') {
+    data.unit = f.unit.value;
+    data.target = parseFloat(f.target.value) || 0;
+    data.current = parseFloat(f.current.value) || 0;
+  } else {
+    // Auto mode — clear manual fields
+    data.unit = '개';
+    data.target = 0;
+    data.current = 0;
+  }
   if (!data.title) { alert('지표명을 입력해 주세요'); return; }
   if (id) {
     Object.assign(state.kpis.find(k => k.id === id), data);
@@ -4022,10 +4277,18 @@ async function actionQuickAddTask(projectId, title) {
 async function actionAddNote(projectId) {
   const el = document.getElementById('pj-note-input');
   const content = (el?.value || '').trim();
-  if (!content) { alert('내용을 입력해 주세요'); return; }
+  const images = pendingNoteImages[projectId] || [];
+  if (!content && images.length === 0) { alert('내용을 입력하거나 이미지를 추가해 주세요'); return; }
   const p = state.projects.find(x => x.id === projectId);
   p.notes = p.notes || [];
-  p.notes.push({ id: uid(), content, authorId: session.currentUserId, createdAt: now() });
+  p.notes.push({
+    id: uid(),
+    content,
+    images: images.slice(),
+    authorId: session.currentUserId,
+    createdAt: now(),
+  });
+  pendingNoteImages[projectId] = [];
   logAct(`프로젝트 노트 작성: ${p.name}`);
   await saveState(); render();
 }
